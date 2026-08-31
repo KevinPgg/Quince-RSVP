@@ -18,6 +18,8 @@ const config: Config = {
       fontFamily: {
         display: 'var(--f-display)',
         body: 'var(--f-body)',
+        cinzel: 'var(--f-titulo)',
+        firma: 'var(--f-firma)',
       },
     },
   },

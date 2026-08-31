@@ -1,21 +1,150 @@
-import { EVENTO } from '@/config/event'
-import { THEME } from '@/config/theme'
+import Link from 'next/link'
+import Image from 'next/image'
+import Filigrana from '@/components/Filigrana'
+import Album from '@/components/Album'
+import Cabecera from '@/components/Cabecera'
+import Revelar from '@/components/Revelar'
+import FondoLargo from '@/components/FondoLargo'
+import { obtenerEvento, flagsDe, fechaLarga, horaDe, ZONA_HORARIA } from '@/lib/evento'
+import Contador from '@/components/Contador'
+import Seccion from '@/components/Seccion'
+import Lugar from '@/components/Lugar'
+import ListaAsistentes from '@/components/ListaAsistentes'
 
-// Landing publica: NO expone ningun dato de invitados.
-export default function Home() {
+export const dynamic = 'force-dynamic'
+
+export default async function Home() {
+  const e = await obtenerEvento()
+  const flags = flagsDe(e)
+
   return (
-    <main className="flex min-h-screen items-center justify-center px-6 text-center">
-      <div className="aparece">
-        <p className="text-xs uppercase tracking-[0.35em] text-muted">Mis XV Años</p>
-        <h1 className="mt-4 font-display text-6xl text-primary">
-          {EVENTO.quinceanera.nombre}
-        </h1>
-        <p className="mt-6 text-accent">{THEME.ornamento}</p>
-        <p className="mt-6 max-w-sm text-sm leading-relaxed text-muted">
-          Esta invitación es personal. Abre el enlace que recibiste para ver tus
-          datos y confirmar tu asistencia.
-        </p>
-      </div>
+    <main className="relative pb-16">
+      {/* Ilustración larga opcional. Ver ILUSTRACION_LARGA en config/galeria.ts. */}
+      <FondoLargo />
+
+      {/* ---------- Cabecera ---------- */}
+      <Cabecera
+        nombre={e.nombre}
+        fecha={fechaLarga(e.fecha, ZONA_HORARIA)}
+        frase={e.frase}
+      />
+
+      {flags.mostrarContador && e.fecha && (
+        <Seccion titulo="Faltan">
+          <Contador fechaISO={e.fecha} />
+        </Seccion>
+      )}
+
+      {/* ---------- Álbum ----------
+          Va temprano, antes de la logística: quien llega a la portada
+          entra por la persona, no por la dirección del salón. */}
+      <Seccion titulo="De niña a quinceañera">
+        <Revelar efecto="zoom">
+          <Album />
+        </Revelar>
+      </Seccion>
+
+      {/* ---------- Sobre la fiesta ---------- */}
+      {e.home_descripcion && (
+        <Seccion titulo={e.home_titulo ?? 'La fiesta'}>
+          <div className="tarjeta space-y-4 text-sm leading-relaxed text-muted">
+            {e.home_descripcion.split('\n').filter(Boolean).map((p, i) => (
+              <p key={i}>{p}</p>
+            ))}
+          </div>
+        </Seccion>
+      )}
+
+      {/* ---------- Lugares ---------- */}
+      <Seccion titulo="Dónde y cuándo">
+        {e.lugar_nombre ? (
+          <Lugar
+            hora={horaDe(e.fecha, ZONA_HORARIA)}
+            lugar={e.lugar_nombre}
+            direccion={e.lugar_direccion ?? ''}
+            mapsUrl={e.lugar_maps}
+          />
+        ) : (
+          <p className="text-center text-sm text-muted">Detalles próximamente.</p>
+        )}
+      </Seccion>
+
+      {/* ---------- Itinerario ---------- */}
+      {flags.mostrarItinerario && (e.itinerario?.length ?? 0) > 0 && (
+        <Seccion titulo="Itinerario">
+          <ol className="tarjeta divide-y divide-line">
+            {e.itinerario.map((it, i) => (
+              <li key={i} className="flex items-baseline justify-between gap-4 py-3">
+                <span className="font-display text-lg text-primary">{it.hora}</span>
+                <span className="text-right text-sm text-muted">{it.titulo}</span>
+              </li>
+            ))}
+          </ol>
+        </Seccion>
+      )}
+
+      {/* ---------- Dress code ---------- */}
+      {flags.mostrarDressCode && e.dress_code_titulo && (
+        <Seccion titulo="Código de vestimenta">
+          <div className="tarjeta text-center">
+            <p className="font-display text-2xl text-primary">{e.dress_code_titulo}</p>
+            {e.dress_code_detalle && (
+              <p className="mt-2 text-sm text-muted">{e.dress_code_detalle}</p>
+            )}
+          </div>
+        </Seccion>
+      )}
+
+      {/* ---------- Mesa de regalos ---------- */}
+      {flags.mostrarRegalos && (e.regalos?.length ?? 0) > 0 && (
+        <Seccion titulo="Mesa de regalos">
+          <div className="space-y-4">
+            {e.regalos.map((r, i) => (
+              <div key={i} className="tarjeta text-center">
+                <p className="font-medium">{r.titulo}</p>
+                {r.detalle && <p className="mt-1 text-sm text-muted">{r.detalle}</p>}
+              </div>
+            ))}
+          </div>
+        </Seccion>
+      )}
+
+      {/* ---------- Quiénes asisten ---------- */}
+      {e.lista_publica_activa && (
+        <Seccion titulo="Nos acompañan" ancla="asistentes">
+          <ListaAsistentes
+            formato={e.lista_publica_formato}
+            incluirAcompanantes={flags.pedirNombresAcompanantes}
+          />
+        </Seccion>
+      )}
+
+      {/* ---------- Llamada a la acción ---------- */}
+      <Seccion>
+        <div className="tarjeta text-center">
+          <p className="font-display text-xl text-primary">¿Tienes tu invitación?</p>
+          <p className="mt-2 text-sm leading-relaxed text-muted">
+            Cada invitación tiene un link personal. Ábrelo para ver tus lugares
+            reservados y confirmar tu asistencia.
+          </p>
+          {e.contacto_whatsapp && (
+            <a
+              href={`https://wa.me/${e.contacto_whatsapp}`}
+              target="_blank"
+              rel="noreferrer"
+              className="boton-borde mt-6"
+            >
+              Escribir a {e.contacto_nombre ?? 'los organizadores'}
+            </a>
+          )}
+        </div>
+      </Seccion>
+
+      <p className="pt-6 text-center">
+        <Link href="/acceso" className="text-[10px] uppercase tracking-[0.2em] text-muted/60">
+          Panel
+        </Link>
+      </p>
     </main>
   )
 }

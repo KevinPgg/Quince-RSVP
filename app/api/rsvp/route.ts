@@ -1,12 +1,11 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
-import { EVENTO } from '@/config/event'
-import { FEATURES } from '@/config/features'
+import { obtenerEvento, flagsDe } from '@/lib/evento'
 
-// ÚNICO punto de escritura de todo el portal.
-// El navegador jamás toca Supabase directamente.
+// ÚNICO punto de escritura público del portal.
+// El navegador nunca habla con Supabase directamente.
 
-const MAX_RESPUESTAS_POR_INVITADO = 10 // freno anti-spam
+const MAX_RESPUESTAS_POR_INVITADO = 20 // freno anti-spam; el link no expira
 
 function limpiar(v: unknown, max = 500): string | null {
   if (typeof v !== 'string') return null
@@ -15,7 +14,7 @@ function limpiar(v: unknown, max = 500): string | null {
 }
 
 export async function POST(req: Request) {
-  let body: any
+  let body: Record<string, unknown>
   try {
     body = await req.json()
   } catch {
@@ -23,50 +22,39 @@ export async function POST(req: Request) {
   }
 
   const token = limpiar(body?.token, 64)
-  if (!token) {
-    return NextResponse.json({ error: 'Falta el identificador.' }, { status: 400 })
-  }
-  if (typeof body?.asiste !== 'boolean') {
+  if (!token) return NextResponse.json({ error: 'Falta el identificador.' }, { status: 400 })
+  if (typeof body?.asiste !== 'boolean')
     return NextResponse.json({ error: 'Elige una opción.' }, { status: 400 })
-  }
 
   const db = supabaseAdmin()
 
   const { data: invitado } = await db
     .from('invitados')
-    .select('id, pases_asignados')
+    .select('id, tipo, pases_asignados')
     .eq('token', token)
     .is('eliminado_en', null)
-    .maybeSingle<{ id: string; pases_asignados: number }>()
+    .maybeSingle()
 
   if (!invitado) {
     return NextResponse.json({ error: 'Invitación no encontrada.' }, { status: 404 })
   }
 
-  // --- Fecha límite ---
-  if (
-    FEATURES.aplicarFechaLimite &&
-    Date.now() > new Date(EVENTO.limiteRsvpISO).getTime()
-  ) {
-    return NextResponse.json(
-      { error: 'El plazo para confirmar ya cerró.' },
-      { status: 403 }
-    )
+  const evento = await obtenerEvento()
+  const flags = flagsDe(evento)
+
+  if (flags.aplicarFechaLimite && evento.limite_rsvp &&
+      Date.now() > new Date(evento.limite_rsvp).getTime()) {
+    return NextResponse.json({ error: 'El plazo para confirmar ya cerró.' }, { status: 403 })
   }
 
-  // --- Respuestas previas ---
   const { count } = await db
     .from('rsvp')
     .select('id', { count: 'exact', head: true })
     .eq('invitado_id', invitado.id)
-
   const previas = count ?? 0
 
-  if (previas > 0 && !FEATURES.permitirCambiarRespuesta) {
-    return NextResponse.json(
-      { error: 'Ya registramos tu respuesta.' },
-      { status: 409 }
-    )
+  if (previas > 0 && !flags.permitirCambiarRespuesta) {
+    return NextResponse.json({ error: 'Ya registramos tu respuesta.' }, { status: 409 })
   }
   if (previas >= MAX_RESPUESTAS_POR_INVITADO) {
     return NextResponse.json(
@@ -75,7 +63,7 @@ export async function POST(req: Request) {
     )
   }
 
-  // --- Pases: nunca más de los asignados ---
+  // Nunca más lugares de los asignados.
   const solicitados = Number(body?.pases_confirmados)
   const pases = body.asiste
     ? Math.min(
@@ -84,13 +72,13 @@ export async function POST(req: Request) {
       )
     : 0
 
-  // --- Campos opcionales: se guardan solo si el flag está activo ---
+  const maxNombres = invitado.tipo === 'grupal' ? pases : Math.max(0, pases - 1)
   const acompanantes =
-    FEATURES.pedirNombresAcompanantes && Array.isArray(body?.acompanantes)
-      ? body.acompanantes
-          .map((a: unknown) => limpiar(a, 120))
-          .filter((a: string | null): a is string => a !== null)
-          .slice(0, Math.max(0, pases - 1))
+    flags.pedirNombresAcompanantes && Array.isArray(body?.acompanantes)
+      ? (body.acompanantes as unknown[])
+          .map((a) => limpiar(a, 120))
+          .filter((a): a is string => a !== null)
+          .slice(0, maxNombres)
       : null
 
   const { error } = await db.from('rsvp').insert({
@@ -98,11 +86,9 @@ export async function POST(req: Request) {
     asiste: body.asiste,
     pases_confirmados: pases,
     acompanantes: acompanantes && acompanantes.length > 0 ? acompanantes : null,
-    restricciones: FEATURES.pedirRestriccionesAlimenticias
-      ? limpiar(body?.restricciones, 300)
-      : null,
-    telefono: FEATURES.pedirTelefono ? limpiar(body?.telefono, 40) : null,
-    mensaje: FEATURES.pedirMensaje ? limpiar(body?.mensaje, 800) : null,
+    restricciones: flags.pedirRestriccionesAlimenticias ? limpiar(body?.restricciones, 300) : null,
+    telefono: flags.pedirTelefono ? limpiar(body?.telefono, 40) : null,
+    mensaje: flags.pedirMensaje ? limpiar(body?.mensaje, 800) : null,
   })
 
   if (error) {

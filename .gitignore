@@ -5,5 +5,3 @@ out
 .env.local
 *.log
 .DS_Store
-scripts/invitados.csv
-scripts/links-generados.csv
