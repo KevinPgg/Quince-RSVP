@@ -8,7 +8,7 @@ del marco. El lavado radial —desenfoque y tinte lila hacia el borde— hace
 que el fondo de la foto se disuelva en la escena en vez de discutir con ella.
 Es la misma receta del retrato de la portada.
 """
-from PIL import Image, ImageFilter, ImageEnhance, ImageDraw
+from PIL import Image, ImageFilter, ImageEnhance, ImageDraw, ImageOps
 import math, os
 
 FUENTE = 'public/recursos/cumpleanera'
@@ -35,7 +35,29 @@ FOTOS = [
     ('angeles-02.jpg', 0.26, 'album-04.webp', 'medio',  0.24),  # primer plano cerradísimo
     ('angeles-06.jpg', 0.40, 'album-05.webp', 'maximo', 0.00),  # globos verdes + lentejuelas
     ('angeles-05.jpg', 0.36, 'album-06.webp', 'medio',  0.00),  # pared beige
+
+    # Tanda 2 (2026-09-27). Sexto campo opcional:
+    #   caja = (izq, arriba, der, abajo) en px de la fuente, se recorta ANTES
+    #          del cuadrado. angeles-15 trae franjas negras de 30 px arriba y
+    #          abajo; angeles-12 viene dentro de un corazón con esquinas
+    #          blancas y solo el centro (~350 px) está limpio, medido.
+    #   cx   = foco horizontal 0..1 para las fuentes apaisadas.
+    ('angeles-08.jpg', 0.36, 'album-07.webp', 'maximo', 0.00),  # piscina de pelotas
+    ('angeles-09.jpg', 0.40, 'album-08.webp', 'medio',  0.00),  # pared lisa
+    ('angeles-10.jpg', 0.60, 'album-09.webp', 'maximo', 0.00),  # árbol de Navidad
+    ('angeles-11.jpg', 0.28, 'album-10.webp', 'medio',  0.00),  # sala
+    ('angeles-12.jpg', 0.50, 'album-11.webp', 'fuerte', 0.00, {'caja': (165, 88, 485, 408)}),  # corazón
+    ('angeles-13.jpg', 0.32, 'album-12.webp', 'medio',  0.00),  # auto
+    ('angeles-14.jpg', 0.30, 'album-13.webp', 'fuerte', 0.00),  # comedor
+    ('angeles-15.jpg', 0.50, 'album-14.webp', 'medio',  0.00, {'caja': (0, 30, 1080, 840), 'cx': 0.36}),  # selfi con franjas
+    ('angeles-07.jpg', 0.24, 'album-15.webp', 'medio',  0.00),  # maquillaje de baile
+    ('angeles-16.jpg', 0.50, 'album-16.webp', 'medio',  0.00, {'cx': 0.5}),  # selfi apaisada
 ]
+
+# Solo regenera las salidas que se pasen por línea de comandos, si se pasa
+# alguna: `python scripts/album.py album-07.webp album-08.webp`.
+import sys
+SOLO = set(sys.argv[1:])
 
 # (radio donde empieza el lavado, radio donde es total, tinte máximo)
 LAVADOS = {
@@ -108,12 +130,17 @@ def capas(nombre):
     return CACHE[nombre]
 
 total = 0
-for archivo, foco, salida, fuerza, margen in FOTOS:
+for archivo, foco, salida, fuerza, margen, *extra in FOTOS:
+    if SOLO and salida not in SOLO:
+        continue
+    opc = extra[0] if extra else {}
     MASC, TINTE = capas(fuerza)
-    im = Image.open(f'{FUENTE}/{archivo}').convert('RGB')
+    im = ImageOps.exif_transpose(Image.open(f'{FUENTE}/{archivo}')).convert('RGB')
+    if 'caja' in opc:
+        im = im.crop(opc['caja'])
     W, H = im.size
     lado = min(W, H)
-    cx = W // 2
+    cx = int(W * opc.get('cx', 0.5))
     cy = int(H * foco)
     t = max(0, min(H - lado, cy - lado // 2))
     l = max(0, min(W - lado, cx - lado // 2))

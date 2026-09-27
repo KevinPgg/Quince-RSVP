@@ -19,12 +19,24 @@ export type FotoAlbum = {
   pie?: string
 }
 
+// Orden aproximado de edad, de niña a hoy. Es una estimación a ojo:
+// para reordenar basta con mover renglones. `pie` vacío = sin pie.
 export const ALBUM: FotoAlbum[] = [
-  { src: '/recursos/cumpleanera/album-01.webp', alt: 'Ángeles de niña, en su patineta', pie: 'Los primeros años' },
+  { src: '/recursos/cumpleanera/album-07.webp', alt: 'Ángeles de bebé en la piscina de pelotas', pie: 'Los primeros años' },
+  { src: '/recursos/cumpleanera/album-08.webp', alt: 'Ángeles de niña con vestido a rayas rosas', pie: '' },
+  { src: '/recursos/cumpleanera/album-09.webp', alt: 'Ángeles de niña frente al árbol de Navidad', pie: 'Navidades' },
+  { src: '/recursos/cumpleanera/album-11.webp', alt: 'Ángeles de niña con vestido de flores', pie: '' },
+  { src: '/recursos/cumpleanera/album-13.webp', alt: 'Ángeles de niña con gafas de sol y scooter', pie: '' },
+  { src: '/recursos/cumpleanera/album-01.webp', alt: 'Ángeles de niña, en su patineta', pie: '' },
   { src: '/recursos/cumpleanera/album-02.webp', alt: 'Ángeles de niña con un gorro de vaquita', pie: '' },
+  { src: '/recursos/cumpleanera/album-10.webp', alt: 'Ángeles de niña con vestido rojo de lunares', pie: '' },
+  { src: '/recursos/cumpleanera/album-12.webp', alt: 'Ángeles de niña con blusa naranja', pie: '' },
   { src: '/recursos/cumpleanera/album-03.webp', alt: 'Ángeles de vestido blanco en el jardín', pie: 'Un día de fiesta' },
   { src: '/recursos/cumpleanera/album-04.webp', alt: 'Ángeles sonriendo de cerca', pie: '' },
   { src: '/recursos/cumpleanera/album-05.webp', alt: 'Ángeles el día de su graduación', pie: 'La graduación' },
+  { src: '/recursos/cumpleanera/album-14.webp', alt: 'Ángeles tomándose una selfi', pie: '' },
+  { src: '/recursos/cumpleanera/album-15.webp', alt: 'Ángeles maquillada para una presentación', pie: 'En el escenario' },
+  { src: '/recursos/cumpleanera/album-16.webp', alt: 'Ángeles con blusa vino', pie: '' },
   { src: '/recursos/cumpleanera/album-06.webp', alt: 'Ángeles hoy', pie: 'Y ahora, quince' },
 ]
 
