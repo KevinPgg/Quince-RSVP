@@ -1,3 +1,6 @@
+import Filigrana from './Filigrana'
+import { Esquinas } from './tema/Ornamentos'
+
 export default function Lugar({
   hora, lugar, direccion, mapsUrl,
 }: {
@@ -7,17 +10,19 @@ export default function Lugar({
   mapsUrl: string | null
 }) {
   return (
-    <div className="tarjeta text-center">
+    <div className="tarjeta-real">
+      <Esquinas />
       {hora && (
         <>
-          <p className="text-[10px] uppercase tracking-[0.2em] text-muted">A las</p>
-          <p className="mt-2 font-display text-4xl text-primary">{hora}</p>
+          <p className="font-cinzel text-[10px] font-semibold uppercase tracking-[0.2em] text-primary">✦ A las ✦</p>
+          <p className="texto-oro mt-1.5 font-display text-[54px] font-medium leading-none">{hora}</p>
+          <div className="mt-3"><Filigrana ancho={74} /></div>
         </>
       )}
-      <p className="mt-4 font-medium">{lugar}</p>
-      {direccion && <p className="mt-1 text-sm leading-snug text-muted">{direccion}</p>}
+      <p className="mt-3 font-display text-2xl leading-tight text-ink">{lugar}</p>
+      {direccion && <p className="mt-1 text-[14.5px] leading-relaxed text-muted">{direccion}</p>}
       {mapsUrl && (
-        <a href={mapsUrl} target="_blank" rel="noreferrer" className="boton-borde mt-5 w-full sm:w-auto">
+        <a href={mapsUrl} target="_blank" rel="noreferrer" className="boton-morado mt-5 w-auto px-7">
           Cómo llegar
         </a>
       )}

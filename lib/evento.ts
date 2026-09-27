@@ -38,6 +38,15 @@ export function fechaLarga(iso: string | null, tz: string): string {
   }).format(new Date(iso))
 }
 
+/** «14 de noviembre de 2026», sin el día de la semana. Para la portada:
+ *  en versalitas con interletraje, `fechaLarga` parte en dos líneas a 390 px. */
+export function fechaSinDia(iso: string | null, tz: string): string {
+  if (!iso) return 'Fecha por confirmar'
+  return new Intl.DateTimeFormat('es-MX', {
+    day: 'numeric', month: 'long', year: 'numeric', timeZone: tz,
+  }).format(new Date(iso))
+}
+
 export function fechaCorta(iso: string | null, tz: string): string {
   if (!iso) return '—'
   return new Intl.DateTimeFormat('es-MX', {

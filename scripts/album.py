@@ -8,25 +8,33 @@ del marco. El lavado radial —desenfoque y tinte lila hacia el borde— hace
 que el fondo de la foto se disuelva en la escena en vez de discutir con ella.
 Es la misma receta del retrato de la portada.
 """
-from PIL import Image, ImageFilter, ImageEnhance
+from PIL import Image, ImageFilter, ImageEnhance, ImageDraw
 import math, os
 
 FUENTE = 'public/recursos/cumpleanera'
 N = 560           # lado del recorte; el hueco mide 540 px de ancho a 2x
 
-# (archivo, foco vertical 0..1, salida, fuerza del lavado)
+# (archivo, foco vertical 0..1, salida, fuerza del lavado, margen)
 #
 # La fuerza no es un gusto: depende de lo ruidoso que sea el fondo real.
 # La graduación tiene globos verdes y lentejuelas de colores detrás, y el
 # verde a media potencia se sigue viendo dentro de una escena morada. Las
 # de fondo liso aguantan un lavado suave y conservan más foto.
+#
+# El margen aleja el encuadre. Es para las fuentes que YA son un primer
+# plano cerrado: ahí el recorte cuadrado no puede abrir más —ya toma el
+# lado completo— y encima el hueco del marco recorta otra vez, así que la
+# cara termina llenando el óvalo entera. Con margen la foto se monta más
+# pequeña dentro del lienzo y el borde se rellena con ella misma,
+# desenfocada; como esa zona es justo la que se lava, el relleno no se
+# lee como relleno.
 FOTOS = [
-    ('angeles-01.jpg', 0.24, 'album-01.webp', 'fuerte'),   # patio de baldosas
-    ('angeles-03.jpg', 0.48, 'album-02.webp', 'medio'),    # escalera
-    ('angeles-04.jpg', 0.30, 'album-03.webp', 'fuerte'),   # césped
-    ('angeles-02.jpg', 0.26, 'album-04.webp', 'suave'),    # primer plano, fondo liso
-    ('angeles-06.jpg', 0.40, 'album-05.webp', 'maximo'),   # globos verdes + lentejuelas
-    ('angeles-05.jpg', 0.36, 'album-06.webp', 'medio'),    # pared beige
+    ('angeles-01.jpg', 0.24, 'album-01.webp', 'fuerte', 0.00),  # patio de baldosas
+    ('angeles-03.jpg', 0.48, 'album-02.webp', 'medio',  0.00),  # escalera
+    ('angeles-04.jpg', 0.30, 'album-03.webp', 'fuerte', 0.00),  # césped
+    ('angeles-02.jpg', 0.26, 'album-04.webp', 'medio',  0.24),  # primer plano cerradísimo
+    ('angeles-06.jpg', 0.40, 'album-05.webp', 'maximo', 0.00),  # globos verdes + lentejuelas
+    ('angeles-05.jpg', 0.36, 'album-06.webp', 'medio',  0.00),  # pared beige
 ]
 
 # (radio donde empieza el lavado, radio donde es total, tinte máximo)
@@ -49,6 +57,48 @@ def radial(n, r0, r1):
             px[x, y] = int(255 * (v*v*(3-2*v)))
     return m
 
+def alejar(base, margen):
+    """Monta `base` reducida dentro de un lienzo N×N para alejar el encuadre.
+
+    Es para las fuentes que ya son un primer plano cerradísimo: ahí el
+    recorte cuadrado no puede abrir más —ya toma el lado completo— así que
+    la única forma de dar aire es montar la foto más pequeña y rellenar el
+    borde.
+
+    Dos detalles que costaron un intento cada uno:
+
+    - El relleno es la MISMA foto ampliada y desenfocada, sin retocarle el
+      brillo. Un relleno plano, o uno un punto más claro, deja el montaje
+      recortado como una calcomanía.
+    - La transición es una ELIPSE muy difuminada, no un rectángulo. Con
+      borde recto se ve la caja del montaje aunque esté difuminada, porque
+      una línea recta en una foto no existe y el ojo la encuentra sola.
+      La elipse además coincide con la forma del hueco del marco.
+
+    El hueco extra no se reparte a partes iguales: 62 % arriba. Estas
+    fotos son selfis en contrapicado y el aire va sobre la cabeza.
+    """
+    if margen <= 0:
+        return base
+    lado = round(N * (1 - margen))
+    hueco = N - lado
+    dy = round(hueco * 0.62)
+    dx = hueco // 2
+    cx, cy = dx + lado / 2, dy + lado / 2
+    rx = ry = lado / 2
+
+    fondo = base.filter(ImageFilter.GaussianBlur(30))
+
+    mascara = Image.new('L', (N, N), 0)
+    ImageDraw.Draw(mascara).ellipse(
+        [cx - rx, cy - ry, cx + rx, cy + ry], fill=255)
+    mascara = mascara.filter(ImageFilter.GaussianBlur(round(hueco * 0.55)))
+
+    frente = Image.new('RGB', (N, N))
+    frente.paste(base.resize((lado, lado), Image.LANCZOS), (dx, dy))
+    return Image.composite(frente, fondo, mascara)
+
+
 CACHE = {}
 def capas(nombre):
     if nombre not in CACHE:
@@ -58,7 +108,7 @@ def capas(nombre):
     return CACHE[nombre]
 
 total = 0
-for archivo, foco, salida, fuerza in FOTOS:
+for archivo, foco, salida, fuerza, margen in FOTOS:
     MASC, TINTE = capas(fuerza)
     im = Image.open(f'{FUENTE}/{archivo}').convert('RGB')
     W, H = im.size
@@ -68,6 +118,7 @@ for archivo, foco, salida, fuerza in FOTOS:
     t = max(0, min(H - lado, cy - lado // 2))
     l = max(0, min(W - lado, cx - lado // 2))
     base = im.crop((l, t, l + lado, t + lado)).resize((N, N), Image.LANCZOS)
+    base = alejar(base, margen)
 
     out = Image.composite(base.filter(ImageFilter.GaussianBlur(13)), base, MASC)
     out = Image.composite(Image.new('RGB', (N, N), LILA), out, TINTE)
@@ -80,5 +131,6 @@ for archivo, foco, salida, fuerza in FOTOS:
         kb = os.path.getsize(ruta) / 1024
         if kb < 60: break
     total += kb
-    print(f'{salida}  {kb:5.0f} KB  (de {archivo}, foco {foco}, lavado {fuerza})')
+    print(f'{salida}  {kb:5.0f} KB  (de {archivo}, foco {foco}, '
+          f'lavado {fuerza}, margen {margen})')
 print(f'TOTAL del album: {total:.0f} KB')

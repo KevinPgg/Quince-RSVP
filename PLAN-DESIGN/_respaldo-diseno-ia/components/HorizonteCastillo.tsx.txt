@@ -1,0 +1,43 @@
+import Image from 'next/image'
+
+/**
+ * El castillo, UNA sola vez, cerrando el scroll.
+ *
+ * `castillo.png` es una silueta plana lila; el resto del sitio pasó a un
+ * lenguaje fotorrealista con el marco ilustrado. Repetida de fondo en
+ * cada sección esa silueta no se lee como riqueza sino como una plantilla
+ * que se repite, y encima compite con el castillo que ya trae la portada.
+ * Aquí aparece una vez, grande, al final: funciona como horizonte que
+ * cierra la página en vez de como marca de agua.
+ *
+ * Va en el flujo normal y no `position: absolute`. Absoluto tendría que
+ * pelearse con los pseudoelementos fijos del `body`, que están en -1 y
+ * -2; en el flujo simplemente ocupa su sitio después de la última
+ * sección.
+ *
+ * La máscara lo desvanece por arriba para que no arranque en seco contra
+ * la tarjeta anterior.
+ */
+export default function HorizonteCastillo() {
+  return (
+    <div aria-hidden className="pointer-events-none relative mt-4 select-none">
+      <div
+        className="mx-auto w-full max-w-3xl"
+        style={{
+          opacity: 0.3,
+          maskImage: 'linear-gradient(180deg, transparent 0%, #000 42%, #000 100%)',
+          WebkitMaskImage: 'linear-gradient(180deg, transparent 0%, #000 42%, #000 100%)',
+        }}
+      >
+        <Image
+          src="/recursos/tema/castillo.png"
+          alt=""
+          width={1137}
+          height={620}
+          sizes="(min-width: 768px) 768px, 100vw"
+          className="h-auto w-full"
+        />
+      </div>
+    </div>
+  )
+}

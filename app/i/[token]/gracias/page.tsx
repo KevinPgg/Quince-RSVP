@@ -1,7 +1,7 @@
-import Image from 'next/image'
 import Link from 'next/link'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import Filigrana from '@/components/Filigrana'
+import { Brillos, Corona } from '@/components/tema/Ornamentos'
 import type { Invitado } from '@/lib/types'
 
 export const dynamic = 'force-dynamic'
@@ -45,41 +45,29 @@ export default async function Gracias({
   }
 
   return (
-    <main className="relative flex min-h-dvh flex-col items-center justify-center overflow-hidden px-8 text-center">
-      {/* Castillo al pie, igual que en la portada. */}
-      <div className="pointer-events-none absolute bottom-0 left-1/2 w-full max-w-2xl -translate-x-1/2 opacity-40 [mask-image:linear-gradient(to_top,#000_38%,transparent_92%)]">
-        <Image
-          src="/recursos/tema/castillo.png"
-          alt=""
-          width={1137}
-          height={620}
-          priority
-          sizes="(min-width: 672px) 672px, 100vw"
-          className="h-auto w-full"
-        />
+    <main className="portada-alto relative isolate flex flex-col pb-[220px] pt-12 items-center justify-center overflow-hidden px-8 text-center">
+      {/* Castillo al pie como máscara, igual que en la portada. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 -z-10"
+        style={{
+          WebkitMask: 'linear-gradient(0deg, transparent 0, #000 120px)',
+          mask: 'linear-gradient(0deg, transparent 0, #000 120px)',
+        }}
+      >
+        <div className="castillo w-[min(100%,560px)] opacity-60" />
       </div>
+      <Brillos
+        lista={[
+          { left: '14%', top: '14%' },
+          { left: '84%', top: '20%', tipo: 'lila' },
+          { left: '20%', top: '46%', tipo: 'estrella' },
+          { left: '78%', top: '40%', tipo: 'rosa' },
+        ]}
+      />
 
       <div className="relative aparece">
-        {/* Corona dibujada, no la PNG: aquí es un gesto animado y conviene
-            que sea vectorial para que el vaivén no se vea pixelado. */}
-        <svg
-          width="56"
-          height="36"
-          viewBox="0 0 150 96"
-          fill="none"
-          aria-hidden
-          className="vaiven mx-auto"
-        >
-          <path
-            d="M14 84 L26 30 L50 58 L75 14 L100 58 L124 30 L136 84 Z"
-            fill="#eed9a4"
-            stroke="#b07d24"
-            strokeWidth="4"
-            strokeLinejoin="round"
-          />
-          <path d="M14 84 H136" stroke="#b07d24" strokeWidth="8" strokeLinecap="round" />
-          <circle cx="75" cy="10" r="9" fill="#c2417d" stroke="#b07d24" strokeWidth="3" />
-        </svg>
+        <Corona className="vaiven mx-auto block h-12 w-[70px] drop-shadow-[0_3px_6px_rgba(160,110,30,0.28)]" />
 
         <h1
           className="mt-2.5 font-firma text-[46px] leading-[1.1] text-[#b52272]"

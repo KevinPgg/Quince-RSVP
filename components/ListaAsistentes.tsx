@@ -64,38 +64,40 @@ export default async function ListaAsistentes({
 
   return (
     <div>
-      <p className="text-center text-sm text-muted">
-        {total} {total === 1 ? 'persona confirmada' : 'personas confirmadas'}
-        {filas.length > 1 && ` · ${filas.length} invitaciones`}
-      </p>
-
-      <ul className="mt-5 flex flex-wrap justify-center gap-2">
+      <ul className="flex flex-wrap justify-center gap-2.5">
         {filas.map((f) => {
           const nombres = integrantes(f, incluirAcompanantes).map(presentar)
           return (
             <li
               key={f.id}
-              className="max-w-full rounded-2xl border border-line bg-surface px-4 py-2.5 shadow-[0_1px_12px_rgba(92,43,134,0.04)]"
+              className="inline-flex max-w-full items-center gap-2.5 rounded-full border border-line bg-white py-2 pl-2 pr-4 text-left shadow-[0_4px_12px_-6px_rgba(92,43,134,0.2)]"
             >
-              <p className="font-cinzel text-[10px] font-semibold uppercase tracking-[0.16em] text-[#8a6a33]">
-                {presentar(f.nombre_display)}
-                {f.pases_confirmados > 1 && (
-                  <span className="text-primary"> · {f.pases_confirmados}</span>
+              {/* Insignia con los lugares confirmados de la invitación. */}
+              <b
+                className="grid h-7 w-7 shrink-0 place-items-center rounded-full font-cinzel text-[11px] font-semibold text-white"
+                style={{ background: 'linear-gradient(180deg,#8b4cb8,#6b3f9e)' }}
+              >
+                {f.pases_confirmados}
+              </b>
+              <span className="min-w-0">
+                <span className="block text-[13px] font-normal leading-tight text-ink">
+                  {presentar(f.nombre_display)}
+                </span>
+                {/* Si no se piden nombres de acompañantes, no hay nada que
+                    enumerar: la insignia ya dice cuántos vienen. */}
+                {(f.tipo === 'grupal' ? nombres.length > 0 : nombres.length > 1) && (
+                  <span className="block text-[11px] leading-snug text-muted">{enumerar(nombres)}</span>
                 )}
-              </p>
-              {/* Si no se piden nombres de acompañantes, no hay nada que
-                  enumerar: se dice cuántos vienen y ya. */}
-              <p className="mt-1 text-[13px] leading-snug text-muted">
-                {nombres.length > 0
-                  ? enumerar(nombres)
-                  : f.pases_confirmados === 1
-                    ? 'Confirmado'
-                    : `${f.pases_confirmados} personas`}
-              </p>
+              </span>
             </li>
           )
         })}
       </ul>
+
+      <p className="mt-5 text-center font-display text-[17px] italic text-muted">
+        <strong className="font-display text-[26px] font-medium not-italic text-primary">{total}</strong>{' '}
+        {total === 1 ? 'invitado confirmado' : 'invitados confirmados'}
+      </p>
     </div>
   )
 }
@@ -148,7 +150,7 @@ export async function MiGrupo({
   const libres = Math.max(0, mia.pases_asignados - mia.pases_confirmados)
 
   return (
-    <div className="tarjeta text-center">
+    <div className="tarjeta-real">
       <p className="font-cinzel text-[10px] font-semibold uppercase tracking-[0.22em] text-[#8a6a33]">
         {mia.pases_confirmados === 1 ? 'Confirmaste' : 'Ustedes confirmaron'}
       </p>

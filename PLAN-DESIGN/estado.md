@@ -303,3 +303,286 @@ navegación. Las seis fotos del álbum suman 97 KB.
   revestidos por la paleta, sin ilustración.
 - `marco-texto.webp` está generado y sin usar; es el candidato natural para
   el bloque «Confirma tu lugar» o para el saludo del cartucho.
+
+---
+
+# Entrega 5 — portada a pantalla completa
+
+## El marco cuadrado no se recorta: se parte en tres
+
+El problema real no era la proporción sino que `marco_princesa.png` es un
+**marco**: lo reconocible vive en el borde —corona arriba-izquierda,
+conejo abajo-izquierda, castillo abajo-derecha, péndulo a la derecha— y el
+centro es crema limpia. Cualquier `cover` a formato vertical se come
+justo el borde. Y una sola imagen vertical larga obliga a fijar una
+proporción que no existe: 0.46 en un iPhone 15, 0.56 en un Android de
+640. Siempre recorta por algún lado.
+
+`scripts/portada.py` lo parte en tres a la altura del **43 %**:
+
+| archivo | contenido | tamaño |
+| --- | --- | --- |
+| `portada-superior.webp` | corona, cortinas, borlas, rosas de arriba | 1160×497, 71 KB |
+| `portada-medio.webp` | la fila del corte, extruida | 1160×6, **0.8 KB** |
+| `portada-inferior.webp` | péndulo, castillo, conejo, pájaro, rosas | 1160×659, 98 KB |
+
+En el componente las dos bandas van a su alto natural (`shrink-0`) y la
+tira del medio absorbe la diferencia con `background-size: 100% 100%`.
+Resultado: la portada llena **cualquier** alto de pantalla sin recortar
+nada y sin costuras.
+
+**Por qué no hay costura.** Las tres piezas comparten la misma fila
+promediada: la tira es esa fila repetida, y las últimas 26 filas de la
+banda superior y las primeras 26 de la inferior se funden hacia ella. Sin
+ese fundido queda un salto de un par de niveles que en una cortina lisa
+se lee como una línea recta.
+
+**Por qué el corte va en 43 % y no en otro sitio.** Medido sobre el
+archivo: corona 2–20 %, borla izquierda 24–40 %, borla derecha 28–42 %,
+péndulo 43–48 %, cúpula de oro 44–62 %, torres 47–88 %, conejo 65–95 %.
+El 43 % es la única franja sin nada: las dos borlas ya terminaron y el
+péndulo, la cúpula y el castillo no han empezado. Lo único que cruza es
+la cadena de oro, que es una línea vertical y al extruirse se lee como
+una cadena más larga que baja hasta el péndulo — sale mejor que el
+original. **Si se cambia el archivo del marco hay que volver a medir
+estas franjas; mover el corte a ojo parte una borla o un castillo.**
+
+Una cortina colgando es un degradado vertical, y por eso extruir una fila
+da tela y no un manchón. La zona estirada se lee como columnas de tela
+larga. Lleva encima un degradado de sombra muy tenue porque la extrusión
+es perfectamente uniforme y a partir de unos 300 px eso empieza a leerse
+como papel tapiz.
+
+## Lo que la portada NO lleva, a propósito
+
+**Ni corona suelta ni `castillo.png` al pie.** El marco ya trae los dos.
+Repetirlos en la misma pantalla se lee como un error de montaje, no como
+abundancia — es el mismo argumento por el que la cabecera anterior ya
+había descartado la corona suelta. Dejar fuera la corona además liberó
+los ~60 px verticales que hacían falta para que la burbuja y el nombre
+entren en un teléfono de 640.
+
+## Contenido, del tablero 4a
+
+Orden: «MIS XV AÑOS» → burbuja (retrato + aro de oro) → nombre en Great
+Vibes → filigrana → fecha. La frase se quedó **fuera** de la portada:
+dentro obligaba a encoger la burbuja o el nombre, y es lo primero que se
+lee al hacer scroll.
+
+- El aro es `.aro-oro` en `globals.css`, con el `conic-gradient` que abre
+  y cierra en `#c08a2e`. El tablero 4a abre en crema y cierra en oro: a
+  140° eso deja la costura recta.
+- El bloque se centra sobre la tira del medio, que es el corredor crema.
+  En pantallas cortas desborda hacia las bandas, pero solo por el centro.
+- **Tope de 300 px de ancho al bloque.** Sin él, la fecha en versalitas
+  con interletraje `0.2em` llegaba de cortina a cortina a 360 px y se
+  metía debajo del péndulo. Ahora ocupa el 26–74 % del ancho, medido.
+  A 360 px la fecha va a 10 px con `0.16em`; desde `sm`, a 12 px.
+- Cuatro destellos del 4a, recolocados dentro del corredor crema: en las
+  posiciones originales caían sobre la cortina, donde no se ven.
+- Una punta de flecha al pie sobre el valle del río. Una portada de alto
+  completo sin nada que indique que hay más abajo se lee como una página
+  de una sola pantalla.
+
+`.portada-alto` lleva `100vh`, `100svh` y `100dvh` en cascada, en ese
+orden. Tailwind no puede expresar tres declaraciones sobre la misma
+propiedad, por eso está en `globals.css` y no como clase utilitaria.
+
+## Verificado
+
+- `npx tsc --noEmit` limpio.
+- Tailwind compilado con el CLI sobre el código real: sin `CssSyntaxError`,
+  o sea sin clases inexistentes.
+- Réplica estática (`PLAN-DESIGN/pruebas/_replica.html` + `_tw.css`, que
+  se dejan justo para esto) servida y capturada con Playwright a
+  360×640, 390×740, 430×932, 1440×900 y 1440×650. En los cinco:
+  `scrollWidth == clientWidth` —sin desborde horizontal— y la portada
+  mide exactamente el alto de la ventana. A 1440×650, el caso peor, las
+  dos bandas suman 598 px y entran.
+- Capturado también con `prefers-reduced-motion: reduce`: la portada se ve
+  completa y quieta.
+
+## Peso
+
+Las tres piezas suman **169 KB** contra los 133 KB de
+`marco-cabecera.webp`. Son 36 KB más por partir el original en dos
+archivos con calidad 84. Medido sobre la réplica estática con `<img>`,
+como el número anterior: la portada sola pesa 256 KB sin tipografías.
+**En la app real, con `next/image`, no está medido.**
+
+`marco-cabecera.webp` queda sin usar en el código; sigue en `public/`
+porque es el candidato para la cabecera de `/i/[token]`.
+
+## `album-04` — encuadre corregido
+
+`angeles-02.jpg` es una selfi en contrapicado cerradísima: el recorte
+cuadrado ya toma el lado completo, así que **no se podía abrir más
+recortando**. `scripts/album.py` gana un parámetro `margen`: monta la
+foto más pequeña dentro del lienzo y rellena el borde con ella misma
+desenfocada. Dos cosas que costaron un intento cada una:
+
+1. El relleno es la misma foto **sin retocarle el brillo**. Un punto más
+   claro y el montaje se ve como una calcomanía pegada.
+2. La transición es una **elipse muy difuminada, no un rectángulo**. Con
+   borde recto se ve la caja del montaje aunque esté difuminada: una línea
+   recta dentro de una foto no existe y el ojo la encuentra sola. La
+   elipse además coincide con la forma del hueco del marco.
+
+`album-04` va con `margen 0.24` y lavado `medio` (antes `suave`): el radio
+donde empieza el lavado, 0.74, cae justo en el borde de la elipse. El
+álbum sigue en 94 KB.
+
+---
+
+# Entrega 6 — indicador, horizonte y movimiento
+
+## El indicador del carrusel vivía dentro del scroller
+
+`components/Album.tsx` tenía los puntos como hermano del `<ul>` **dentro**
+del contenedor con `overflow-x-auto`. Un hijo de bloque dentro de un
+contenedor con scroll resuelve su ancho contra el ancho **visible**, no
+contra el del contenido: los puntos quedaban clavados en el origen del
+scroll y se iban de pantalla al avanzar el carrusel. Encima heredaban el
+`pb-4` del scroller y aparecían pegados al pie de la primera foto.
+
+Ahora el scroller y el indicador son hermanos dentro de un envoltorio, y
+el indicador lleva `mt-5`. El pie de foto pasó de `mt-1` a `mt-2`.
+
+Medido con Playwright a 360, 390 y 1440: el centro del indicador está al
+50 % del ancho **y sigue al 50 % después de desplazar el carrusel 600 px**.
+Antes esa segunda medida era la que fallaba.
+
+## Punto 2, opción B — el castillo una sola vez
+
+`castillo.png` es una silueta plana lila; el sitio pasó a un lenguaje
+fotorrealista. Repetida de fondo en cada sección no se lee como riqueza
+sino como plantilla, y compite con el castillo que ya trae la portada.
+`components/HorizonteCastillo.tsx` lo pone **una vez**, grande, al final
+de la página, con máscara que lo desvanece por arriba. Va en el flujo
+normal y no en absoluto: en absoluto tendría que pelearse con los
+pseudoelementos fijos del `body`, que están en `z-index` -1 y -2.
+
+Lo que sí se repite —variando— son **pétalos recortados del propio
+marco**. `Seccion` gana `juego` (0, 1 o 2) y `fondo`. Tres juegos de tres
+pétalos que rotan por sección para que dos seguidas nunca lleven el mismo
+dibujo. El álbum va con `fondo="ninguno"`: ya tiene los suyos encima del
+marco.
+
+**Las posiciones están escritas a mano, no salen de `Math.random()`.** Con
+aleatorio el servidor y el cliente pintan cosas distintas y React tira un
+error de hidratación.
+
+**`overflow-hidden` en `Seccion` no es cosmético**: los pétalos se colocan
+en porcentajes y sin recorte el que va al 90 % empuja el ancho del
+documento y aparece scroll horizontal en un móvil.
+
+## Punto 3 — de dónde salen los pétalos, y por qué las rosas esperan
+
+`scripts/ornamentos.py` etiqueta las **componentes conexas del canal
+alfa** de `marco-foto.webp`. El marco es una sola masa conectada por el
+borde; lo único aislado dentro del hueco son los pétalos que el
+ilustrador dejó flotando. Eso los encuentra solos, con su alfa real, sin
+inventarles una silueta ni recortarlos a ojo. Salieron once; se exportan
+los seis mayores al doble de tamaño. **El `petalo-5` está descartado a
+mano en `config/galeria.ts`: arrastra una esquina de cortina morada.**
+
+Los cuatro racimos de rosas también se recortan, con su posición exacta
+en % del marco. Pero **la capa de rosas está apagada a propósito**:
+
+> Montar la copia de una rosa encima de la rosa que el marco ya trae
+> pintada compone dos veces el mismo borde semitransparente. Medido: el
+> contorno sale hasta 64/255 más oscuro en 10 113 píxeles. **No es la
+> compresión** — el mismo experimento en WebP sin pérdida da idéntico
+> resultado. Es el doble alfa. Y mientras el original está debajo, el
+> recorrido no puede pasar de un par de píxeles sin que asome.
+
+Por eso `MARCO_FOTO.sinRosas` empieza en `false` y la capa no se renderiza.
+Cuando exista el marco sin rosas: apuntar `MARCO_FOTO.marco` al archivo
+nuevo y poner `sinRosas: true`. La capa se enciende con `.mece-amplio`
+—3 px y 1.8°— sin tocar nada más.
+
+Lo que sí funciona hoy son **tres pétalos a la deriva sobre la tarjeta
+activa**, con ancho en % y no en píxeles porque la tarjeta mide 72vw en
+móvil y 300 px desde `sm`. Solo en la activa: seis tarjetas por tres
+pétalos animados son dieciocho composiciones simultáneas y en un móvil
+eso se siente en el scroll.
+
+Los tres ritmos (`.deriva`, `-b`, `-c`) tienen periodos 11/14/17 s,
+primos entre sí, para que el conjunto no caiga en sincronía; con periodos
+parecidos el ojo detecta el compás y se ve como un GIF en bucle. El giro
+base llega en `--giro` desde el estilo en línea y los keyframes lo
+**suman** con `calc()` en vez de sustituirlo: si el keyframe pusiera
+`rotate(9deg)` a secas, cada pétalo perdería su orientación al arrancar y
+daría un salto visible.
+
+## Verificado
+
+`tsc` limpio, Tailwind compilado con el CLI sin errores, y capturas a
+360×640, 390×740 y 1440×900. En las tres: `scrollWidth == clientWidth`,
+indicador fuera del scroller y centrado antes y después de desplazar.
+
+## Pendiente que depende de Kevin
+
+Los dos archivos que hay que generar están descritos en
+`PLAN-DESIGN/prompts-generacion.md`. Hasta que existan:
+
+- La portada sigue con las tres bandas del marco cuadrado.
+- `rosa-si/sd/ii/id.webp` están generados y **sin usar** — como
+  `marco-texto.webp`. No se sirven.
+
+---
+
+# Entrega 6 — vuelta al tablero 4a/5a, todo en CSS (2026-09-27)
+
+Decisión de Kevin: dejar de depender de imágenes generadas por IA y volver
+al diseño 4a/5a, subiendo el nivel con CSS. Maqueta aprobada en
+`PLAN-DESIGN/pruebas/maqueta-portada.html` y `maqueta-invitacion.html`.
+
+## Qué imágenes quedan
+
+Solo `castillo.png`, `fondo-invitacion.png` y las fotos
+(`retrato.jpg`, `album-0*.webp`). El castillo ya no se muestra como
+imagen: es **máscara** (`.castillo` en `globals.css`) rellena con un
+degradado de atardecer y ventanas encendidas. Corona, perlas, lazo,
+joyas y volutas son SVG en `components/tema/Ornamentos.tsx`; sus
+degradados se definen una vez en `<DefsTema />` dentro del layout.
+
+## Componentes
+
+- Nuevos: `Portada` (sustituye a `Cabecera`), `Camafeos` (sustituye a
+  `Album`), `Itinerario`, `tema/Ornamentos`.
+- Reestilizados: `Seccion` (eyebrow + título + ornamento, sin pétalos),
+  `Contador` (medallones), `Lugar`, `Ornamento`, `Cartucho`,
+  `HorizonteCastillo`, `ListaAsistentes` (insignia con los lugares).
+- Sin usar pero sin borrar: `Cabecera`, `Album`, `Petalos`, `FondoLargo`
+  y los recursos `portada-*`, `marco-*`, `petalo-*`, `rosa-*`. Las
+  versiones anteriores de los archivos reescritos están en
+  `PLAN-DESIGN/_respaldo-diseno-ia/` con extensión `.txt` (si quedan como
+  `.tsx`, `tsc` y el build los compilan y fallan).
+- `.tarjeta` del panel no se tocó; lo ceremonioso usa `.tarjeta-real`.
+
+## Cambios de orden
+
+En `/i/[token]` el formulario RSVP sube justo debajo del cartucho, como
+en 5a. La información de la fiesta va después.
+
+## Trampas nuevas
+
+- `overflow: hidden` en la sección cortaba en recto las sombras de las
+  tarjetas. `Seccion` usa `overflow-x: clip`.
+- Un velo del color del fondo para desvanecer el castillo deja una
+  franja, porque el fondo es un degradado. Se desvanece con `mask`.
+- Un trazo SVG horizontal con degradado `objectBoundingBox` no se pinta
+  (caja de alto cero). Las líneas del ornamento van en color sólido.
+- `fechaLarga` en versalitas parte en dos líneas a 390 px. La portada
+  usa `fechaSinDia` (nueva en `lib/evento.ts`).
+- En clases arbitrarias de Tailwind, `calc()` va con `_` alrededor de
+  los operadores.
+
+## Verificado
+
+`npx tsc --noEmit` limpio; Tailwind compilado con el CLI sin errores.
+Render de las páginas reales con `react-dom/server` y datos de prueba
+(mocks de Supabase, `next/image` como `<img>`), capturado a 360, 390 y
+1440 px con y sin movimiento reducido: sin scroll horizontal, fecha en
+una línea. **Falta** `npm run dev` / `npm run build` en Windows.

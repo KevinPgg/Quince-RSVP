@@ -11,6 +11,7 @@ function diff(target: number) {
   }
 }
 
+/** Cuatro medallones de oro. */
 export default function Contador({ fechaISO }: { fechaISO: string }) {
   const target = new Date(fechaISO).getTime()
   const [t, setT] = useState<ReturnType<typeof diff> | null>(null)
@@ -23,22 +24,22 @@ export default function Contador({ fechaISO }: { fechaISO: string }) {
 
   // null en el primer render evita desajuste servidor/cliente
   const celdas: [string, number | null][] = [
-    ['días', t?.d ?? null],
-    ['hrs', t?.h ?? null],
-    ['min', t?.m ?? null],
-    ['seg', t?.s ?? null],
+    ['Días', t?.d ?? null],
+    ['Horas', t?.h ?? null],
+    ['Min', t?.m ?? null],
+    ['Seg', t?.s ?? null],
   ]
 
   return (
-    <div className="grid grid-cols-4 gap-3">
+    <div className="mx-auto grid max-w-[420px] grid-cols-4 gap-2.5">
       {celdas.map(([label, v]) => (
-        <div key={label} className="tarjeta px-2 py-4 text-center">
-          <div className="font-display text-3xl text-primary tabular-nums">
+        <div key={label} className="medallon">
+          <b className="font-display text-[28px] font-medium leading-none text-primary tabular-nums sm:text-[32px]">
             {v === null ? '–' : String(v).padStart(2, '0')}
-          </div>
-          <div className="mt-1 text-[10px] uppercase tracking-[0.15em] text-muted">
+          </b>
+          <span className="mt-1 font-cinzel text-[8px] font-semibold uppercase tracking-[0.18em] text-[#9c7a3e]">
             {label}
-          </div>
+          </span>
         </div>
       ))}
     </div>

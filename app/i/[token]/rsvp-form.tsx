@@ -42,7 +42,7 @@ export default function RsvpForm({
   // ---- Plazo cerrado y sin respuesta previa ----
   if (vencido && !yaRespondio) {
     return (
-      <div className="tarjeta text-center">
+      <div className="tarjeta-real">
         <p className="text-sm leading-relaxed text-muted">
           El plazo para confirmar cerró{limiteTexto ? ` el ${limiteTexto}` : ''}.
           Por favor contáctanos directamente.
@@ -55,7 +55,7 @@ export default function RsvpForm({
   if (yaRespondio && !editando) {
     const r = respuesta!
     return (
-      <div className="tarjeta text-center">
+      <div className="tarjeta-real">
         <p className="font-firma text-[38px] leading-tight text-[#b52272]" style={{ paddingTop: '0.1em' }}>
           {r.asiste ? '¡Nos vemos ahí!' : 'Te vamos a extrañar'}
         </p>
@@ -127,7 +127,7 @@ export default function RsvpForm({
   const camposNombres = tipo === 'grupal' ? confirmados : Math.max(0, confirmados - 1)
 
   return (
-    <div className="tarjeta space-y-6">
+    <div className="rounded-3xl border border-line bg-white px-5 py-6 shadow-[var(--sombra-real)] space-y-6">
       <div className="grid grid-cols-2 gap-2.5">
         <button
           type="button"
@@ -176,8 +176,8 @@ export default function RsvpForm({
                   key={i}
                   className={
                     i < confirmados
-                      ? 'h-[17px] w-[17px] rounded-full bg-accent shadow-[0_0_0_3px_rgba(192,138,46,0.18)]'
-                      : 'h-[17px] w-[17px] rounded-full border border-[#e2d3b6] bg-[#f2ecdd]'
+                      ? 'h-[17px] w-[17px] rounded-full shadow-[0_0_0_3px_rgba(192,138,46,0.18)] [background:radial-gradient(circle_at_35%_30%,#fbecc4,#c08a2e_55%,#9c6d1f)]'
+                      : 'h-[17px] w-[17px] rounded-full bg-[#f2ecdd] shadow-[inset_0_0_0_1px_#e2d3b6]'
                   }
                 />
               ))}
@@ -245,7 +245,7 @@ export default function RsvpForm({
         <div>
           <label className="etiqueta-tema" htmlFor="mensaje">Un mensaje para la quinceañera</label>
           <textarea
-            id="mensaje" className="campo min-h-24 font-display text-base italic" placeholder="Opcional"
+            id="mensaje" className="campo min-h-[80px] font-display text-[17px] italic" placeholder="Opcional"
             value={mensaje} onChange={(ev) => setMensaje(ev.target.value)}
           />
         </div>

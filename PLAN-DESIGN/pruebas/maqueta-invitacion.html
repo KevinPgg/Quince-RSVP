@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Maqueta — Invitación (CSS)</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&family=Cinzel:wght@400;600;700&family=Great+Vibes&display=swap">
+<link rel="stylesheet" href="_fonts-local.css">
+<link rel="stylesheet" href="maqueta.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="g-oro" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f6e4b4"/><stop offset=".3" stop-color="#c08a2e"/>
+      <stop offset=".55" stop-color="#f9efcf"/><stop offset=".8" stop-color="#a8741f"/><stop offset="1" stop-color="#eed9a4"/>
+    </linearGradient>
+    <radialGradient id="g-perla" cx=".35" cy=".3" r=".7"><stop offset="0" stop-color="#fff"/><stop offset=".45" stop-color="#f6eefb"/><stop offset="1" stop-color="#cdb7de"/></radialGradient>
+    <radialGradient id="g-joya" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#ffd0e6"/><stop offset=".5" stop-color="#c2417d"/><stop offset="1" stop-color="#7a1048"/></radialGradient>
+  </defs>
+  <symbol id="corona" viewBox="0 0 70 48">
+    <path d="M6 40 L3 14 L18 26 L27 6 L35 22 L43 6 L52 26 L67 14 L64 40 Z" fill="url(#g-oro)" stroke="#9c6d1f" stroke-width=".8" stroke-linejoin="round"/>
+    <rect x="5" y="39" width="60" height="7" rx="2" fill="url(#g-oro)" stroke="#9c6d1f" stroke-width=".8"/>
+    <circle cx="3" cy="13" r="3" fill="url(#g-perla)"/><circle cx="67" cy="13" r="3" fill="url(#g-perla)"/>
+    <circle cx="27" cy="5" r="3" fill="url(#g-perla)"/><circle cx="43" cy="5" r="3" fill="url(#g-perla)"/>
+    <path d="M35 14 l4 7 -4 7 -4 -7z" fill="url(#g-joya)"/>
+    <circle cx="20" cy="42.5" r="2" fill="url(#g-joya)"/><circle cx="35" cy="42.5" r="2.4" fill="url(#g-joya)"/><circle cx="50" cy="42.5" r="2" fill="url(#g-joya)"/>
+  </symbol>
+  <symbol id="corazon" viewBox="0 0 22 20"><path d="M11 19C4 13.5 1 10.3 1 6.8 1 3.6 3.4 1 6.5 1 8.4 1 10.1 2 11 3.6 11.9 2 13.6 1 15.5 1 18.6 1 21 3.6 21 6.8c0 3.5-3 6.7-10 12.2Z" fill="#c2417d"/></symbol>
+  <symbol id="ornamento" viewBox="0 0 180 18">
+    <path d="M4 9 H62" stroke="#c08a2e" stroke-width="1"/><path d="M176 9 H118" stroke="#c08a2e" stroke-width="1"/>
+    <path d="M62 9 C70 1 78 1 80 7 C81 11 76 12 75 9" fill="none" stroke="#c08a2e" stroke-width="1"/>
+    <path d="M118 9 C110 1 102 1 100 7 C99 11 104 12 105 9" fill="none" stroke="#c08a2e" stroke-width="1"/>
+    <path d="M62 9 C70 17 78 17 80 11" fill="none" stroke="#c08a2e" stroke-width="1"/>
+    <path d="M118 9 C110 17 102 17 100 11" fill="none" stroke="#c08a2e" stroke-width="1"/>
+    <path d="M90 2 l6 7 -6 7 -6 -7z" fill="url(#g-joya)" stroke="#c08a2e" stroke-width=".8"/>
+  </symbol>
+</svg>
+
+<header class="heroe">
+  <div class="petalos"></div>
+  <div class="aurora a1" style="top:45%"></div>
+  <div class="fundido"><div class="castillo"></div></div>
+  <div aria-hidden="true" style="position:absolute;inset:0;pointer-events:none">
+    <span class="destello" style="left:15%;top:16%"></span>
+    <span class="destello lila" style="left:81%;top:24%"></span>
+    <span class="estrella" style="left:24%;top:44%"></span>
+    <span class="estrella" style="left:72%;top:12%"></span>
+  </div>
+  <div class="heroe-texto">
+    <svg class="corona entra d1" style="width:58px;height:40px;margin:0 auto 10px;display:block"><use href="#corona"/></svg>
+    <p class="cinzel entra d2" style="margin:0;font-size:11px;letter-spacing:.34em;color:#8d6bab">Mis</p>
+    <div class="xv entra d3" aria-label="XV"><span class="filo">XV</span><span class="relleno" aria-hidden="true">XV</span><span class="reflejo" aria-hidden="true">XV</span></div>
+    <p class="firma entra d4" style="font-size:68px;margin-top:6px">Ángeles</p>
+    <p class="cinzel entra d5" style="margin:14px 0 0;font-size:11px;letter-spacing:.2em;color:#5c3a80">14 · Noviembre · 2026</p>
+  </div>
+</header>
+
+<main class="contenedor" style="padding-bottom:40px">
+  <div class="cartucho entra d6">
+    <div class="cartucho-in">
+            <p class="cinzel" style="position:relative;margin:0;font-size:10px;letter-spacing:.26em;color:#8a6a33">Con cariño para</p>
+      <p class="firma" style="position:relative;font-size:42px;line-height:1.15;margin-top:10px">Familia Vera Suárez</p>
+      <div class="filigrana" style="margin-top:12px"><svg width="12" height="11"><use href="#corazon"/></svg></div>
+      <div style="position:relative;margin-top:14px;display:flex;justify-content:center;gap:8px">
+        <span class="pildora oro">✦ 4 lugares</span><span class="pildora tenue">Mesa 7</span>
+      </div>
+      <p class="texto" style="position:relative;margin-top:16px;font-size:13px">Se han reservado cuatro lugares para ustedes en el salón.</p>
+    </div>
+  </div>
+
+  <div class="titulo" style="margin:40px 0 16px">
+    <h2 class="cinzel" style="font:600 13px/1 var(--f-titulo);letter-spacing:.26em;color:#7b3fa0">Confirma tu lugar</h2>
+    <svg class="ornamento"><use href="#ornamento"/></svg>
+  </div>
+
+  <form class="formulario" onsubmit="return false">
+    <div class="opciones">
+      <button class="boton boton-morado" type="button">Sí asistiremos</button>
+      <button class="boton boton-tenue" type="button">No podremos</button>
+    </div>
+    <div style="margin-top:22px">
+      <span class="etiqueta">¿Cuántos de los 4 lugares se ocupan?</span>
+      <div class="stepper" role="group" aria-label="Lugares">
+        <button type="button" aria-label="Uno menos">–</button>
+        <div class="p" aria-hidden="true"><i></i><i></i><i></i><i class="vacio"></i></div>
+        <button type="button" aria-label="Uno más">+</button>
+      </div>
+      <p style="margin:8px 0 0;text-align:center;font:300 12px/1.5 var(--f-body);color:#8d6bab">3 de 4 lugares confirmados</p>
+    </div>
+    <div style="margin-top:18px">
+      <span class="etiqueta">Nombres de quienes asisten</span>
+      <div style="display:grid;gap:9px">
+        <input class="campo" value="Marcela Vera"><input class="campo" placeholder="Persona 2"><input class="campo" placeholder="Persona 3">
+      </div>
+    </div>
+    <div style="margin-top:18px">
+      <span class="etiqueta">Un mensaje para la quinceañera</span>
+      <textarea class="campo" placeholder="Opcional"></textarea>
+    </div>
+    <button class="boton boton-rosa" type="submit" style="width:100%;margin-top:20px">Enviar respuesta</button>
+    <p style="margin:12px 0 0;text-align:center;font:300 11px/1.6 var(--f-body);color:#8d6bab">Puedes responder hasta el 1 de noviembre. Guarda este enlace: sirve para cambiar tu respuesta.</p>
+  </form>
+</main>
+
+<script>
+document.querySelectorAll('svg[data-arco]').forEach(function(s){
+  // perlas siguiendo la curva superior del cartucho
+  var n=+s.dataset.arco, h='';
+  for(var i=0;i<n;i++){var t=i/(n-1), a=Math.PI*(1-t), x=150+140*Math.cos(a), y=58-52*Math.sin(a);
+    h+='<ellipse cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" rx="'+(i%2?1.8:2.6)+'" ry="'+(i%2?1.8:2.6)+'" fill="url(#g-perla)"/>';}
+  s.innerHTML=h;
+});
+</script>
+</body>
+</html>

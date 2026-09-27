@@ -1,25 +1,24 @@
 /**
- * Filigrana de oro para separar secciones. Más ornamental que `Filigrana`,
- * que es la línea con el corazón bajo los nombres.
- *
- * Es SVG en línea y no un archivo: son 40 líneas que no justifican una
- * petición HTTP, y así hereda `currentColor` si algún día hace falta.
+ * Volutas de oro con una joya al centro, bajo cada título de sección.
+ * Más ornamental que `Filigrana`, que es la línea con el corazón bajo los
+ * nombres. Las líneas van en color sólido y no con el degradado `t-oro`:
+ * un trazo horizontal tiene caja de alto cero y el degradado en
+ * `objectBoundingBox` no se pinta.
  */
 export default function Ornamento({ className = '' }: { className?: string }) {
   return (
     <div className={`flex justify-center ${className}`} aria-hidden>
-      <svg width="168" height="20" viewBox="0 0 168 20" fill="none">
-        <g stroke="#c08a2e" strokeWidth="1.1" strokeLinecap="round" fill="none">
-          {/* Volutas enfrentadas */}
-          <path d="M6 10c14 0 20-6 30-6s14 5 22 5" opacity=".55" />
-          <path d="M162 10c-14 0-20-6-30-6s-14 5-22 5" opacity=".55" />
-          <path d="M30 10c6 0 9 4 15 4s9-4 15-4" opacity=".8" />
-          <path d="M138 10c-6 0-9 4-15 4s-9-4-15-4" opacity=".8" />
+      <svg width="180" height="18" viewBox="0 0 180 18" fill="none">
+        <path d="M4 9 H62 M176 9 H118" stroke="#c08a2e" strokeWidth="1" />
+        <g stroke="#c08a2e" strokeWidth="1" fill="none">
+          <path d="M62 9 C70 1 78 1 80 7 C81 11 76 12 75 9" />
+          <path d="M118 9 C110 1 102 1 100 7 C99 11 104 12 105 9" />
+          <path d="M62 9 C70 17 78 17 80 11" />
+          <path d="M118 9 C110 17 102 17 100 11" />
         </g>
-        {/* Rombo central */}
-        <path d="M84 3.5 88.5 10 84 16.5 79.5 10Z" fill="#c08a2e" opacity=".85" />
-        <circle cx="70" cy="10" r="1.8" fill="#c2417d" opacity=".75" />
-        <circle cx="98" cy="10" r="1.8" fill="#c2417d" opacity=".75" />
+        <path d="M90 2 l6 7 -6 7 -6 -7z" fill="url(#t-joya)" stroke="#c08a2e" strokeWidth=".8" />
+        <circle cx="4" cy="9" r="1.6" fill="#c08a2e" />
+        <circle cx="176" cy="9" r="1.6" fill="#c08a2e" />
       </svg>
     </div>
   )

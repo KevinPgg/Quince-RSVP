@@ -1,0 +1,361 @@
+/* =============================================================
+   Maqueta «Princesa Sofía» — tablero 4a/5a llevado a CSS.
+   Cero ilustración generada: solo castillo.png (usado como
+   MÁSCARA, no como imagen), fondo-invitacion.png y las fotos.
+   Todo lo demás —oro, perlas, corona, filigranas— es CSS/SVG.
+   ============================================================= */
+
+:root{
+  --c-base:253 250 255; --c-surface:255 255 255; --c-ink:58 40 74;
+  --c-muted:109 85 128; --c-primary:123 63 160; --c-accent:192 138 46;
+  --c-line:233 220 243;
+  --rosa:#b52272;
+
+  /* Oro en tres recetas: lámina (bordes), bruñido (texto), mate (líneas) */
+  --oro-lamina: linear-gradient(135deg,#f6e4b4 0%,#c08a2e 26%,#f9efcf 48%,#a8741f 70%,#eed9a4 88%,#c08a2e 100%);
+  --oro-brunido: linear-gradient(180deg,#e9cf8f 0%,#c08a2e 45%,#8f6420 55%,#d9b76a 100%);
+  --oro-mate: #c08a2e;
+
+  --f-display:'Cormorant Garamond',Georgia,serif;
+  --f-body:'Jost',system-ui,sans-serif;
+  --f-titulo:'Cinzel',Georgia,serif;
+  --f-firma:'Great Vibes',cursive;
+
+  --sombra-suave: 0 1px 2px rgba(92,43,134,.05), 0 8px 24px -6px rgba(92,43,134,.12), 0 24px 48px -24px rgba(92,43,134,.18);
+  color-scheme:light;
+}
+
+/* Ángulo animable para el aro de oro que gira */
+@property --ang{syntax:'<angle>';initial-value:0deg;inherits:false}
+@property --brillo{syntax:'<percentage>';initial-value:50%;inherits:false}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; color:rgb(var(--c-ink)); background:rgb(var(--c-base));
+  font:300 15px/1.6 var(--f-body); -webkit-font-smoothing:antialiased; overflow-x:hidden;
+}
+img{display:block;max-width:100%}
+
+/* ---------- Cielo: degradado + tres auroras + polvo de perla ---------- */
+body::before{
+  content:''; position:fixed; inset:0; z-index:-3; pointer-events:none;
+  background:
+    radial-gradient(60% 40% at 15% 10%, rgba(243,190,222,.35), transparent 70%),
+    radial-gradient(55% 45% at 90% 30%, rgba(206,176,240,.35), transparent 70%),
+    radial-gradient(70% 50% at 50% 100%, rgba(244,224,174,.28), transparent 70%),
+    linear-gradient(180deg,#fefcff 0%,#faf3fd 46%,#f3e9fa 78%,#ece0f6 100%);
+}
+body::after{
+  content:''; position:fixed; inset:0; z-index:-2; pointer-events:none; opacity:.55;
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(192,138,46,.35) 0 1px, transparent 1.6px),
+    radial-gradient(circle at 70% 80%, rgba(123,63,160,.22) 0 1px, transparent 1.6px),
+    radial-gradient(circle at 45% 55%, rgba(181,34,114,.18) 0 .8px, transparent 1.4px);
+  background-size: 140px 140px, 190px 190px, 110px 110px;
+}
+
+.contenedor{width:100%;max-width:34rem;margin:0 auto;padding:0 20px}
+
+/* ---------- Tipografía ceremoniosa ---------- */
+.eyebrow{margin:0;font:400 10px/1 var(--f-body);letter-spacing:.42em;text-transform:uppercase;color:#8d6bab}
+.firma{font-family:var(--f-firma);font-weight:400;color:var(--rosa);line-height:1;padding-top:.14em;margin:0}
+.cinzel{font-family:var(--f-titulo);font-weight:600;text-transform:uppercase}
+
+/* Texto en lámina de oro, con guarda: sin soporte queda oro sólido */
+.texto-oro{color:#a8741f}
+@supports ((-webkit-background-clip:text) or (background-clip:text)){
+  .texto-oro{
+    background:linear-gradient(100deg,#8f6420 0%,#b07d24 30%,#e3bf6e var(--brillo),#b07d24 70%,#8f6420 100%);
+    background-size:100% 100%;
+    -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+  }
+}
+
+/* ---------- Filigrana: línea de oro + corazón ---------- */
+.filigrana{display:flex;align-items:center;justify-content:center;gap:12px}
+.filigrana::before,.filigrana::after{content:'';width:74px;height:1px}
+.filigrana::before{background:linear-gradient(90deg,rgba(192,138,46,0),#c08a2e)}
+.filigrana::after{background:linear-gradient(90deg,#c08a2e,rgba(192,138,46,0))}
+
+/* ---------- Destellos ---------- */
+.destello{position:absolute;width:5px;height:5px;border-radius:50%;background:#e8d49a;box-shadow:0 0 12px 3px rgba(232,212,154,.8)}
+.destello.lila{background:#d9b6ee;box-shadow:0 0 10px 3px rgba(217,182,238,.8)}
+.destello.rosa{background:#f0cfe2;box-shadow:0 0 12px 3px rgba(240,207,226,.85)}
+/* estrella de cuatro puntas, hecha con dos degradados cruzados */
+.estrella{position:absolute;width:18px;height:18px;
+  background:
+    radial-gradient(closest-side,#fff8e1,rgba(255,248,225,0)) center/100% 2px no-repeat,
+    radial-gradient(closest-side,#fff8e1,rgba(255,248,225,0)) center/2px 100% no-repeat;
+  filter:drop-shadow(0 0 4px rgba(232,212,154,.9))}
+
+/* =============================================================
+   PORTADA
+   ============================================================= */
+.portada{--castillo-w:min(100vw,560px);position:relative;min-height:100vh;min-height:100svh;display:grid;place-items:center;overflow:hidden;isolation:isolate;padding:44px 0 calc(var(--castillo-w)*.42 + 36px)}
+
+/* Auroras que respiran detrás del retrato */
+.cielo{position:absolute;inset:0;z-index:-1;pointer-events:none;-webkit-mask:linear-gradient(0deg,transparent 0,#000 35%);mask:linear-gradient(0deg,transparent 0,#000 35%)}
+.aurora{position:absolute;border-radius:50%;filter:blur(40px);z-index:-1;opacity:.55}
+.aurora.a1{width:340px;height:340px;left:50%;top:38%;translate:-50% -50%;background:radial-gradient(circle,#f6d9ec,transparent 70%)}
+.aurora.a2{width:260px;height:260px;left:18%;top:20%;background:radial-gradient(circle,#e3cdf7,transparent 70%)}
+.aurora.a3{width:220px;height:220px;right:6%;top:52%;background:radial-gradient(circle,#f7e8c4,transparent 70%)}
+
+/* Rayos de luz que bajan desde arriba, como de un vitral */
+.rayos{position:absolute;inset:-10% -30% auto;height:75%;z-index:-1;pointer-events:none;opacity:.5;
+  background:repeating-conic-gradient(from 180deg at 50% -10%, rgba(255,255,255,0) 0deg 7deg, rgba(255,246,222,.55) 8deg 10deg, rgba(255,255,255,0) 11deg 18deg);
+  -webkit-mask:radial-gradient(70% 90% at 50% 0%, #000 20%, transparent 75%);
+          mask:radial-gradient(70% 90% at 50% 0%, #000 20%, transparent 75%)}
+
+/* Castillo: la silueta es MÁSCARA; el color lo pone un degradado de atardecer */
+.castillo{
+  position:absolute; left:50%; bottom:0; translate:-50% 0; z-index:-1;
+  width:var(--castillo-w,min(100%,560px)); aspect-ratio:1137/620; pointer-events:none;
+  background:linear-gradient(180deg,#e7c9f2 0%,#d6aee9 45%,#e8b9d6 80%,#f3d7e4 100%);
+  -webkit-mask:url(../../public/recursos/tema/castillo.png) center bottom/contain no-repeat;
+          mask:url(../../public/recursos/tema/castillo.png) center bottom/contain no-repeat;
+  opacity:.75;
+}
+/* Ventanas encendidas: puntos cálidos, recortados por la misma máscara */
+.castillo::after{content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(circle at 50% 62%, rgba(255,236,190,.95) 0 3px, transparent 4px),
+    radial-gradient(circle at 41% 70%, rgba(255,236,190,.8) 0 2px, transparent 3px),
+    radial-gradient(circle at 59% 70%, rgba(255,236,190,.8) 0 2px, transparent 3px),
+    radial-gradient(circle at 33% 45%, rgba(255,236,190,.7) 0 2px, transparent 3px),
+    radial-gradient(circle at 67% 45%, rgba(255,236,190,.7) 0 2px, transparent 3px)}
+.fundido{position:absolute;inset:0;z-index:-1;pointer-events:none;
+  -webkit-mask:linear-gradient(0deg,transparent 0,#000 110px);mask:linear-gradient(0deg,transparent 0,#000 110px)}
+.fundido .castillo{z-index:auto}
+
+.portada-contenido{position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 28px;max-width:340px}
+
+.corona{width:70px;height:48px;margin-bottom:14px;filter:drop-shadow(0 3px 6px rgba(160,110,30,.28))}
+
+/* Retrato: aro de oro que gira + collar de perlas + halo */
+.retrato{position:relative;width:172px;height:172px;margin-top:22px}
+.retrato::before{content:'';position:absolute;inset:-26px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,244,214,.9) 30%,rgba(255,244,214,0) 70%);z-index:-1}
+.retrato .aro{position:absolute;inset:-9px;border-radius:50%;
+  background:conic-gradient(from var(--ang),#c08a2e,#f4e0ae 12%,#c08a2e 25%,#f7ecc9 42%,#b07d24 62%,#eed9a4 82%,#c08a2e);
+  box-shadow:0 14px 34px rgba(92,43,134,.18)}
+.retrato .separador{position:absolute;inset:-2px;border-radius:50%;background:#fdfaff}
+.retrato .foto{position:absolute;inset:0;border-radius:50%;overflow:hidden;background:#f0e6f7}
+.retrato .foto img{width:100%;height:100%;object-fit:cover}
+.retrato .perlas{position:absolute;inset:-22px;width:calc(100% + 44px);height:calc(100% + 44px);overflow:visible}
+
+.portada .nombre{font-size:76px;margin-top:26px;text-shadow:0 1px 0 rgba(255,255,255,.9),0 6px 22px rgba(181,34,114,.18)}
+.portada .fecha{margin:16px 0 0;font:600 12px/1 var(--f-titulo);letter-spacing:.2em;text-transform:uppercase;color:#5c3a80}
+.portada .frase{margin:20px 0 0;max-width:270px;font:italic 300 17px/1.55 var(--f-display);color:#6d5580;text-wrap:pretty}
+
+.baja{position:absolute;left:50%;bottom:22px;translate:-50% 0;display:flex;flex-direction:column;align-items:center;gap:6px;
+  font:400 9px/1 var(--f-body);letter-spacing:.34em;text-transform:uppercase;color:#8d6bab;text-decoration:none}
+.baja svg{width:14px;height:14px}
+
+/* =============================================================
+   SECCIONES
+   ============================================================= */
+.seccion{position:relative;padding:64px 0 8px;overflow-x:clip}
+.titulo{text-align:center;margin-bottom:26px}
+.titulo .eyebrow{margin-bottom:10px}
+.titulo h2{margin:0;font:400 34px/1.1 var(--f-display);color:rgb(var(--c-primary));letter-spacing:.01em}
+.titulo h2 em{font-family:var(--f-firma);font-style:normal;color:var(--rosa);font-size:1.25em}
+.ornamento{display:block;margin:12px auto 0;width:180px;height:18px}
+
+/* Tarjeta de oro: borde en lámina + filete interior + esquinas */
+.tarjeta{
+  position:relative; padding:28px 24px; border-radius:22px; text-align:center;
+  border:1.5px solid transparent;
+  background:linear-gradient(#fff,#fff) padding-box, var(--oro-lamina) border-box;
+  box-shadow:var(--sombra-suave);
+}
+.tarjeta::before{content:'';position:absolute;inset:7px;border:1px solid rgba(192,138,46,.28);border-radius:16px;pointer-events:none}
+.tarjeta .esq{position:absolute;width:30px;height:30px;color:#c08a2e;pointer-events:none}
+.tarjeta .esq.si{top:3px;left:3px}
+.tarjeta .esq.sd{top:3px;right:3px;scale:-1 1}
+.tarjeta .esq.ii{bottom:3px;left:3px;scale:1 -1}
+.tarjeta .esq.id{bottom:3px;right:3px;scale:-1 -1}
+/* Arco: la tarjeta que corona la sección */
+.tarjeta.arco{border-radius:50% 50% 22px 22px / 84px 84px 22px 22px;padding-top:48px}
+.tarjeta.arco::before{border-radius:50% 50% 16px 16px / 78px 78px 16px 16px}
+
+.texto{font:300 14.5px/1.75 var(--f-body);color:rgb(var(--c-muted));margin:0}
+.texto+.texto{margin-top:12px}
+.capitular::first-letter{float:left;font:400 58px/.8 var(--f-firma);color:var(--rosa);padding:8px 8px 0 0}
+
+/* ---------- Contador: cuatro medallones ---------- */
+.contador{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.medallon{position:relative;aspect-ratio:1;border-radius:50%;display:grid;place-content:center;text-align:center;
+  border:1.5px solid transparent;
+  background:radial-gradient(circle at 50% 30%,#fff,#fbf5ff) padding-box, conic-gradient(from 200deg,#c08a2e,#f6e4b4,#a8741f,#f9efcf,#c08a2e) border-box;
+  box-shadow:var(--sombra-suave)}
+.medallon::after{content:'';position:absolute;inset:5px;border-radius:50%;border:1px dashed rgba(192,138,46,.35)}
+.medallon b{font:500 30px/1 var(--f-display);color:rgb(var(--c-primary));font-variant-numeric:tabular-nums}
+.medallon span{margin-top:4px;font:600 8px/1 var(--f-titulo);letter-spacing:.18em;color:#9c7a3e;text-transform:uppercase}
+
+/* ---------- Álbum: camafeos ovalados ---------- */
+.album{display:flex;gap:18px;overflow-x:auto;scroll-snap-type:x mandatory;padding:18px 0 26px;scrollbar-width:none;margin-inline:calc(50% - 50vw)}
+.album::before,.album::after{content:'';flex:0 0 calc(50% - 110px - 18px)}
+.album::-webkit-scrollbar{display:none}
+.camafeo{flex:0 0 220px;scroll-snap-align:center;margin:0;text-align:center}
+.camafeo .marco{position:relative;aspect-ratio:3/4;border-radius:50%;padding:7px;
+  background:var(--oro-lamina);box-shadow:0 18px 36px -14px rgba(92,43,134,.35), inset 0 0 0 1px rgba(255,255,255,.5)}
+.camafeo .marco::before{content:'';position:absolute;inset:3px;border-radius:50%;border:1px solid rgba(255,250,235,.8)}
+.camafeo .interior{position:relative;height:100%;border-radius:50%;overflow:hidden;background:#efe4f7;box-shadow:inset 0 0 0 3px #fdfaff, inset 0 0 22px rgba(92,43,134,.25)}
+.camafeo img{width:100%;height:100%;object-fit:cover}
+/* Lazo de oro en la parte alta del camafeo */
+.camafeo .lazo{position:absolute;left:50%;top:-12px;translate:-50% 0;width:44px;height:24px;z-index:2;filter:drop-shadow(0 2px 3px rgba(120,80,20,.3))}
+.camafeo figcaption{margin-top:14px;font:400 26px/1 var(--f-firma);color:var(--rosa);min-height:26px}
+.puntos{display:flex;justify-content:center;gap:8px;margin-top:4px}
+.puntos i{width:7px;height:7px;border-radius:50%;background:#e2d3b6}
+.puntos i:first-child{background:#c08a2e;box-shadow:0 0 0 3px rgba(192,138,46,.18)}
+
+/* ---------- Dónde y cuándo ---------- */
+.hora{font:500 54px/1 var(--f-display);margin:6px 0 4px}
+.lugar-nombre{font:400 24px/1.2 var(--f-display);color:rgb(var(--c-ink));margin:10px 0 4px}
+.chip-dia{display:inline-flex;gap:8px;align-items:center;font:600 10px/1 var(--f-titulo);letter-spacing:.2em;color:#7b3fa0;text-transform:uppercase}
+
+/* ---------- Itinerario: línea de tiempo con gemas ---------- */
+.itinerario{list-style:none;margin:0;padding:0;position:relative;text-align:left}
+.itinerario::before{content:'';position:absolute;left:78px;top:8px;bottom:8px;width:1px;background:linear-gradient(180deg,rgba(192,138,46,0),#c08a2e 12%,#c08a2e 88%,rgba(192,138,46,0))}
+.itinerario li{display:grid;grid-template-columns:62px 32px 1fr;align-items:center;padding:12px 0}
+.itinerario .h{font:500 20px/1 var(--f-display);color:rgb(var(--c-primary));text-align:right}
+.itinerario .gema{justify-self:center;width:11px;height:11px;rotate:45deg;background:var(--oro-lamina);box-shadow:0 0 0 4px #fff, 0 0 0 5px rgba(192,138,46,.35)}
+.itinerario .t{font:400 15px/1.3 var(--f-body);color:rgb(var(--c-ink))}
+.itinerario .t small{display:block;font-size:12px;color:rgb(var(--c-muted));font-weight:300}
+
+/* ---------- Dress code ---------- */
+.muestras{display:flex;justify-content:center;gap:14px;margin-top:18px}
+.muestras span{width:30px;height:30px;border-radius:50%;box-shadow:inset 0 -4px 8px rgba(0,0,0,.12), inset 0 3px 6px rgba(255,255,255,.7), 0 0 0 3px #fff, 0 0 0 4px rgba(192,138,46,.5)}
+
+/* ---------- Asistentes: chip-grupo compacto ---------- */
+.grupos{display:flex;flex-wrap:wrap;justify-content:center;gap:10px}
+.grupo{display:inline-flex;align-items:center;gap:10px;padding:8px 16px 8px 8px;border-radius:999px;background:#fff;border:1px solid rgb(var(--c-line));box-shadow:0 4px 12px -6px rgba(92,43,134,.2);font:400 13px/1.3 var(--f-body);text-align:left}
+.grupo b{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;font:600 11px/1 var(--f-titulo);color:#fff;background:linear-gradient(180deg,#8b4cb8,#6b3f9e)}
+.grupo small{display:block;font-size:11px;color:rgb(var(--c-muted));font-weight:300}
+.total{margin-top:18px;text-align:center;font:italic 400 17px/1.4 var(--f-display);color:rgb(var(--c-muted))}
+.total strong{font:500 26px/1 var(--f-display);color:rgb(var(--c-primary));font-style:normal}
+
+/* ---------- Botones ---------- */
+.boton{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 22px;white-space:nowrap;border-radius:999px;
+  font:600 11px/1 var(--f-titulo);letter-spacing:.16em;text-transform:uppercase;text-decoration:none;cursor:pointer;border:0;overflow:hidden;isolation:isolate}
+.boton-morado{color:#fff;background:linear-gradient(180deg,#8b4cb8,#6b3f9e);box-shadow:0 6px 16px rgba(107,63,158,.28), inset 0 1px 0 rgba(255,255,255,.25)}
+.boton-rosa{color:#fff;background:linear-gradient(180deg,#c93e88,#a81e6a);box-shadow:0 8px 20px rgba(168,30,106,.28), inset 0 1px 0 rgba(255,255,255,.25)}
+.boton-oro{color:#5c3a0e;background:var(--oro-lamina);box-shadow:0 6px 16px rgba(160,110,30,.28), inset 0 1px 0 rgba(255,255,255,.5)}
+.boton-tenue{color:#6d5580;background:#fff;border:1px solid rgb(var(--c-line))}
+/* reflejo que cruza el botón */
+.boton-morado::after,.boton-rosa::after,.boton-oro::after{content:'';position:absolute;inset:0;z-index:-1;
+  background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.35) 50%,transparent 65%);translate:-120% 0}
+
+/* ---------- Cierre ---------- */
+.horizonte{position:relative;height:260px;margin-top:40px;overflow:hidden;isolation:isolate;
+  -webkit-mask:linear-gradient(180deg,transparent 0,#000 45%);mask:linear-gradient(180deg,transparent 0,#000 45%)}
+
+.horizonte .castillo{width:min(100%,560px);opacity:.7;
+  background:linear-gradient(180deg,#c9a0e3 0%,#b98bd8 50%,#d49ac4 100%)}
+.horizonte .sol{position:absolute;left:50%;bottom:20px;translate:-50% 0;width:420px;height:420px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,232,190,.9),rgba(255,214,236,.5) 40%,transparent 70%);z-index:-2}
+.pie{text-align:center;padding:14px 0 30px;font:400 10px/1 var(--f-body);letter-spacing:.24em;text-transform:uppercase;color:rgba(109,85,128,.55)}
+
+/* =============================================================
+   INVITACIÓN /i/[token]
+   ============================================================= */
+.heroe{position:relative;height:420px;overflow:hidden;isolation:isolate;max-width:36rem;margin:0 auto}
+.heroe .petalos{position:absolute;inset:-4% -8%;z-index:-1;opacity:.55;
+  background:url(../../public/recursos/tema/fondo-invitacion.png) center top/cover no-repeat}
+.heroe .castillo{width:min(100%,440px);opacity:.5}
+.heroe .fundido{-webkit-mask:linear-gradient(0deg,transparent 0,#000 90px);mask:linear-gradient(0deg,transparent 0,#000 90px)}
+.heroe-texto{position:absolute;left:0;right:0;top:34px;text-align:center}
+.xv{position:relative;height:100px;margin-top:4px;font:700 100px/1 var(--f-titulo)}
+.xv .filo{-webkit-text-stroke:6px #c08a2e;color:#c08a2e;filter:drop-shadow(0 6px 14px rgba(160,110,30,.3))}
+.xv .relleno{position:absolute;left:0;right:0;top:0;color:#c2417d}
+@supports ((-webkit-background-clip:text) or (background-clip:text)){
+  .xv .relleno{background:linear-gradient(180deg,#f7b3d3 0%,#d1478f 38%,#a41863 74%,#dd5f9f 100%);
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+}
+/* brillo que recorre el XV */
+.xv .reflejo{position:absolute;left:0;right:0;top:0;color:transparent}
+@supports ((-webkit-background-clip:text) or (background-clip:text)){
+  .xv .reflejo{background:linear-gradient(110deg,transparent 40%,rgba(255,255,255,.75) 50%,transparent 60%) no-repeat;background-size:250% 100%;background-position:150% 0;
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+}
+
+.cartucho{margin:-30px auto 0;max-width:30rem;padding:3px;border-radius:120px 120px 22px 22px;
+  background:var(--oro-lamina);box-shadow:0 16px 38px rgba(92,43,134,.16);position:relative;z-index:2}
+.cartucho-in{position:relative;border-radius:117px 117px 19px 19px;background:
+  radial-gradient(120% 60% at 50% 0%, #fffaf0, #fff 60%);padding:36px 22px 28px;text-align:center}
+.cartucho-in::before{content:'';position:absolute;inset:8px;border:1px solid rgba(192,138,46,.35);border-radius:110px 110px 13px 13px;pointer-events:none}
+.cartucho .perlas-arco{position:absolute;left:8px;right:8px;top:8px;height:60px;pointer-events:none}
+.pildora{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:8px 14px;font:600 10px/1 var(--f-titulo);letter-spacing:.14em}
+.pildora.oro{border:1px solid #c08a2e;color:#7b3fa0;background:linear-gradient(180deg,#fffaf0,#fff)}
+.pildora.tenue{border:1px solid rgb(var(--c-line));color:#6d5580}
+
+.formulario{border-radius:24px;background:#fff;padding:24px 20px;border:1px solid rgb(var(--c-line));box-shadow:var(--sombra-suave)}
+.opciones{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.etiqueta{display:block;margin-bottom:10px;font:400 10px/1 var(--f-body);letter-spacing:.16em;text-transform:uppercase;color:#8d6bab}
+.stepper{display:flex;align-items:center;justify-content:space-between;border-radius:16px;background:#fdfaff;border:1px solid rgb(var(--c-line));padding:8px 10px}
+.stepper button{width:44px;height:44px;border-radius:50%;border:1px solid rgb(var(--c-line));background:#fff;font:400 20px/1 var(--f-body);color:#7b3fa0;cursor:pointer}
+.stepper .p{display:flex;gap:9px}
+.stepper .p i{width:17px;height:17px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fbecc4,#c08a2e 55%,#9c6d1f);box-shadow:0 0 0 3px rgba(192,138,46,.18)}
+.stepper .p i.vacio{background:#f2ecdd;box-shadow:inset 0 0 0 1px #e2d3b6}
+.campo{width:100%;min-height:46px;border-radius:12px;background:#fff;border:2px solid rgb(var(--c-line));padding:11px 14px;font:300 16px/1.3 var(--f-body);color:rgb(var(--c-ink));transition:border-color .2s, box-shadow .2s}
+.campo:focus{outline:none;border-color:#7b3fa0;box-shadow:0 0 0 4px rgba(123,63,160,.12)}
+textarea.campo{min-height:80px;font:italic 300 17px/1.5 var(--f-display);resize:vertical}
+
+/* =============================================================
+   MOVIMIENTO — todo aquí dentro, incluido el estado oculto
+   ============================================================= */
+@media (prefers-reduced-motion: no-preference){
+  @keyframes girar{to{--ang:360deg}}
+  @keyframes titilar{0%,100%{opacity:.15;transform:scale(.5)}50%{opacity:1;transform:scale(1)}}
+  @keyframes respirar{0%,100%{transform:scale(1);opacity:.5}50%{transform:scale(1.12);opacity:.75}}
+  @keyframes derivar{0%,100%{translate:0 0}50%{translate:12px -16px}}
+  @keyframes rayos{0%,100%{opacity:.35}50%{opacity:.6}}
+  @keyframes pasar{0%,70%{translate:-120% 0}100%{translate:120% 0}}
+  @keyframes barrer{0%,60%{background-position:150% 0}100%{background-position:-50% 0}}
+  @keyframes brunir{0%,100%{--brillo:15%}50%{--brillo:85%}}
+  @keyframes flotar{0%,100%{translate:0 0}50%{translate:0 -6px}}
+  @keyframes bajar{0%,100%{translate:0 0;opacity:.6}50%{translate:0 5px;opacity:1}}
+  @keyframes aparecer{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+  @keyframes enfocar{from{opacity:0;transform:scale(.94);filter:blur(4px)}to{opacity:1;transform:none;filter:none}}
+
+  .retrato .aro{animation:girar 12s linear infinite}
+  .destello{animation:titilar 3.4s ease-in-out infinite}
+  .destello:nth-child(2n){animation-duration:4.1s;animation-delay:.8s}
+  .destello:nth-child(3n){animation-duration:2.9s;animation-delay:1.6s}
+  .estrella{animation:titilar 5s ease-in-out infinite}
+  .estrella:nth-child(2n){animation-delay:2.3s;animation-duration:6.2s}
+  .aurora.a1{animation:respirar 11s ease-in-out infinite}
+  .aurora.a2{animation:derivar 14s ease-in-out infinite}
+  .aurora.a3{animation:derivar 17s ease-in-out infinite reverse}
+  .rayos{animation:rayos 9s ease-in-out infinite}
+  .corona{animation:flotar 5s ease-in-out infinite}
+  .texto-oro{animation:brunir 6s ease-in-out infinite}
+  .baja svg{animation:bajar 2.2s ease-in-out infinite}
+  .boton-morado::after,.boton-rosa::after,.boton-oro::after{animation:pasar 5s ease-in-out infinite}
+  .xv .reflejo{animation:barrer 6s ease-in-out infinite}
+
+  /* Entrada del héroe, escalonada */
+  .entra{animation:aparecer .9s cubic-bezier(.2,.7,.2,1) both}
+  .entra.d1{animation-delay:.1s}.entra.d2{animation-delay:.25s}.entra.d3{animation-delay:.45s}
+  .entra.d4{animation-delay:.6s}.entra.d5{animation-delay:.75s}.entra.d6{animation-delay:.9s}
+
+  /* Revelado al hacer scroll: nativo donde existe, sin JS */
+  @supports (animation-timeline: view()){
+    .revela{animation:aparecer linear both;animation-timeline:view();animation-range:entry 0% cover 28%}
+    .camafeo{animation:enfocar linear both;animation-timeline:view(inline);animation-range:entry 10% cover 45%}
+  }
+}
+
+@media (min-width:768px){
+  .portada{--castillo-w:600px;padding-bottom:calc(600px*.545 + 24px)}
+  .retrato{width:220px;height:220px}
+  .portada .nombre{font-size:104px}
+  .portada .fecha{font-size:14px}
+  .portada .frase{font-size:20px;max-width:340px}
+  .portada-contenido{max-width:420px}
+  .corona{width:84px;height:58px}
+}
+
+.opciones .boton{padding:0 10px;letter-spacing:.08em;font-size:10.5px}
+.capitular::first-letter{all:unset}

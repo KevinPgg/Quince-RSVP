@@ -1,0 +1,391 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Jost:wght@300;400;500&family=Cinzel:wght@400;600&family=Great+Vibes&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ===========================================================
+   TEMÁTICA — «Princesa Sofía» (paleta 4b)
+   Cambiar estos siete valores reviste todo el sitio.
+   Formato: canales RGB separados por espacio (sin rgb()).
+   =========================================================== */
+:root {
+  --c-base:    253 250 255;  /* lila casi blanco */
+  --c-surface: 255 255 255;  /* tarjetas */
+  --c-ink:      58  40  74;  /* morado muy oscuro, no negro */
+  --c-muted:   109  85 128;  /* texto secundario */
+  --c-primary: 123  63 160;  /* morado real */
+  --c-accent:  192 138  46;  /* oro viejo */
+  --c-line:    233 220 243;  /* bordes */
+
+  --f-display: 'Cormorant Garamond', Georgia, serif;
+  --f-body:    'Jost', system-ui, sans-serif;
+  --f-titulo:  'Cinzel', Georgia, serif;
+  --f-firma:   'Great Vibes', cursive;
+
+  /* El sitio es claro SIEMPRE. Sin esto, un navegador en modo oscuro
+     pinta los controles de formulario con su propio esquema y el
+     texto sale blanco sobre fondo blanco. */
+  color-scheme: light;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background-color: rgb(var(--c-base));
+  color: rgb(var(--c-ink));
+  font-family: var(--f-body);
+  font-weight: 300;
+  -webkit-font-smoothing: antialiased;
+  /* Evita el desbordamiento horizontal en móviles angostos. */
+  overflow-x: hidden;
+}
+
+/* Degradado de fondo. Va en un pseudoelemento fijo y no en
+   `background: ... fixed` del body: en Safari iOS ese atajo repinta mal
+   al hacer scroll y produce saltos. Aquí el elemento no se mueve nunca. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background: linear-gradient(180deg, #fefcff 0%, #faf3fd 46%, #f3e9fa 78%, #ece0f6 100%);
+}
+
+/* Campo de pétalos detrás de toda la página.
+   Cubre cualquier alto de scroll —es un mosaico fijo, no una imagen
+   estirada— y pesa 2 KB. Muy bajo de opacidad: se nota como textura,
+   no como dibujo, y nunca compite con el texto de las tarjetas. */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.38;
+  background-image: url('/recursos/tema/patron-petalos.svg');
+  background-repeat: repeat;
+  background-size: 260px 260px;
+}
+
+/* Diseño pensado primero para pantallas de 360 px.
+   Las variantes sm:/lg: solo agrandan, nunca reconstruyen. */
+@layer components {
+  .contenedor { @apply mx-auto w-full max-w-xl px-5; }
+
+  .titulo-seccion {
+    @apply font-display text-2xl font-normal tracking-wide text-primary sm:text-3xl;
+  }
+
+  .tarjeta {
+    @apply rounded-2xl border border-line bg-surface p-5
+           shadow-[0_1px_20px_rgba(0,0,0,0.04)] sm:p-6;
+  }
+
+  /* Tarjeta con esquinas de oro. Para los bloques que llevan peso
+     ceremonioso; la .tarjeta normal se queda lisa. */
+  .tarjeta-oro {
+    @apply tarjeta relative;
+  }
+  .tarjeta-oro::before,
+  .tarjeta-oro::after {
+    content: '';
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    border-color: rgba(192, 138, 46, 0.5);
+    border-style: solid;
+    pointer-events: none;
+  }
+  .tarjeta-oro::before {
+    top: 8px; left: 8px;
+    border-width: 1px 0 0 1px;
+    border-top-left-radius: 10px;
+  }
+  .tarjeta-oro::after {
+    bottom: 8px; right: 8px;
+    border-width: 0 1px 1px 0;
+    border-bottom-right-radius: 10px;
+  }
+
+
+
+  /* Alto de la portada. Los tres valores en cascada a propósito:
+     `dvh` es el bueno —descuenta la barra del navegador cuando se
+     retrae—, `svh` cubre a quien tiene `dvh` sin `svh`, y `vh` es el
+     respaldo para navegadores viejos, donde sobra un poco de alto pero
+     nada se rompe. Tailwind no puede expresar una cascada de tres
+     declaraciones sobre la misma propiedad. */
+  .portada-alto {
+    min-height: 100vh;
+    min-height: 100svh;
+    min-height: 100dvh;
+  }
+
+  /* Aro de oro de la burbuja del retrato.
+     Abre y cierra en el mismo `#c08a2e`. Con el crema al principio y el
+     oro al final —como venía en el tablero— a 140° se ve el corte del
+     cierre como una costura recta. */
+  .aro-oro {
+    background: conic-gradient(
+      from 140deg,
+      #c08a2e,
+      #f4e0ae 12%,
+      #c08a2e 30%,
+      #f7ecc9 48%,
+      #b07d24 66%,
+      #eed9a4 84%,
+      #c08a2e
+    );
+  }
+
+  /* Altura mínima de 44 px: el mínimo táctil cómodo. */
+  .boton {
+    @apply inline-flex min-h-11 items-center justify-center rounded-full px-6 py-3
+           text-sm uppercase tracking-[0.15em] transition
+           disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .boton-primario { @apply boton bg-primary text-white active:opacity-80 sm:hover:opacity-90; }
+  .boton-borde    { @apply boton border border-primary text-primary active:bg-primary active:text-white sm:hover:bg-primary sm:hover:text-white; }
+
+  /* --- Botones de la invitación (tablero 5a) ---------------------
+     Cinzel en versalitas, no la tipografía de cuerpo: son los únicos
+     botones ceremoniosos del sitio. El resto del panel sigue con
+     .boton-primario y .boton-borde. */
+  .boton-tema {
+    @apply inline-flex min-h-11 w-full items-center justify-center rounded-full
+           px-6 py-3 font-cinzel text-[11px] font-semibold uppercase tracking-[0.16em]
+           transition disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .boton-morado {
+    @apply boton-tema text-white shadow-[0_6px_16px_rgba(107,63,158,0.28)]
+           [background:linear-gradient(180deg,#8b4cb8,#6b3f9e)]
+           active:opacity-85 sm:hover:opacity-90;
+  }
+  .boton-rosa {
+    @apply boton-tema text-white shadow-[0_8px_20px_rgba(168,30,106,0.28)]
+           [background:linear-gradient(180deg,#c93e88,#a81e6a)]
+           active:opacity-85 sm:hover:opacity-90;
+  }
+  .boton-tenue {
+    @apply boton-tema border border-line bg-white text-muted
+           active:border-primary active:text-primary sm:hover:border-primary sm:hover:text-primary;
+  }
+  .boton-oro {
+    @apply boton-tema w-auto border border-accent text-primary
+           active:bg-accent/10 sm:hover:bg-accent/10;
+  }
+
+  /* Etiqueta fina de la invitación. Distinta de .etiqueta: más pequeña
+     y en el lila claro del tablero 5a. */
+  .etiqueta-tema {
+    @apply mb-2 block text-[10px] uppercase tracking-[0.16em] text-[#8d6bab];
+  }
+
+  /* text-base = 16 px: por debajo de eso, iOS hace zoom al enfocar. */
+  .campo {
+    @apply w-full min-h-11 rounded-xl border-2 border-line px-4 py-3 text-base
+           outline-none transition
+           focus:border-primary focus:ring-2 focus:ring-primary/15;
+    /* Negro y blanco literales, sin variables ni herencia: ningún modo
+       oscuro del navegador puede reinterpretarlos. */
+    color: #111111;
+    -webkit-text-fill-color: #111111;
+    background-color: #ffffff;
+    caret-color: #111111;
+  }
+  .campo::placeholder {
+    color: #8a8a8a;
+    -webkit-text-fill-color: #8a8a8a;
+    opacity: 1;
+  }
+  .etiqueta { @apply mb-2 block text-xs uppercase tracking-[0.12em] text-muted; }
+
+  /* «XV» de la invitación: degradado rosa recortado al texto.
+     El color plano es el respaldo. Si se pusiera
+     `-webkit-text-fill-color: transparent` sin la guarda, un navegador
+     que no aplique `background-clip: text` dejaría el XV invisible. */
+  .xv-relleno { color: #c2417d; }
+  @supports ((-webkit-background-clip: text) or (background-clip: text)) {
+    .xv-relleno {
+      background: linear-gradient(180deg, #f39ec6, #d1478f 38%, #a41863 74%, #dd5f9f);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+  }
+}
+
+/* Los controles nativos también deben ser claros. */
+@layer base {
+  input, select, textarea, button, option {
+    color-scheme: light;
+  }
+
+  /* Red de seguridad: cualquier control, esté o no marcado con .campo. */
+  input, select, textarea, option {
+    color: #111111;
+    -webkit-text-fill-color: #111111;
+  }
+  option { background-color: #ffffff; }
+
+  /* El autorrelleno de Chrome pinta el fondo y el texto por su cuenta.
+     Este truco lo obliga a respetar la paleta. */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus {
+    -webkit-text-fill-color: #111111;
+    -webkit-box-shadow: 0 0 0 1000px #ffffff inset;
+    caret-color: #111111;
+  }
+
+  /* Windows en alto contraste no debe borrar los bordes. */
+  @media (forced-colors: active) {
+    .campo, .tarjeta { border: 1px solid CanvasText; }
+  }
+}
+
+/* ===========================================================
+   MOVIMIENTO
+
+   Todo lo que se mueve vive dentro de
+   `prefers-reduced-motion: no-preference`. Fuera de ahí no se
+   define ninguna animación, así que quien pide menos movimiento
+   ve la página quieta y COMPLETA. Ese es el punto: `.revela`
+   empieza oculto, y si ese estado inicial viviera fuera de la
+   media query, un usuario con movimiento reducido vería media
+   página en blanco esperando un trigger que nunca llega.
+   =========================================================== */
+@media (prefers-reduced-motion: no-preference) {
+
+  .aparece { animation: aparece 0.8s ease both; }
+  @keyframes aparece {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: none; }
+  }
+
+  /* --- Revelado al entrar en pantalla ---------------------
+     El observador de intersección añade `.visible`. Si el JS no
+     corre, `<noscript>` en el layout deja todo visible. */
+  .revela {
+    opacity: 0;
+    transform: translateY(22px);
+    transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+                transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: opacity, transform;
+  }
+  .revela.visible { opacity: 1; transform: none; will-change: auto; }
+
+  /* Variantes; se combinan con .revela */
+  .revela-zoom           { transform: translateY(22px) scale(0.94); }
+  .revela-zoom.visible   { transform: none; }
+  .revela-giro           { transform: translateY(18px) rotate(-2.5deg) scale(0.96); }
+  .revela-giro.visible   { transform: none; }
+  .revela-izq            { transform: translateX(-26px); }
+  .revela-izq.visible    { transform: none; }
+  .revela-der            { transform: translateX(26px); }
+  .revela-der.visible    { transform: none; }
+
+  /* Escalonado dentro de un grupo */
+  .revela-1 { transition-delay: 0.08s; }
+  .revela-2 { transition-delay: 0.16s; }
+  .revela-3 { transition-delay: 0.24s; }
+  .revela-4 { transition-delay: 0.32s; }
+
+  /* --- Movimientos continuos ------------------------------ */
+  .destello { animation: destello 3.6s ease-in-out infinite; }
+  @keyframes destello {
+    0%, 100% { opacity: 0.15; transform: scale(0.85); }
+    50%      { opacity: 0.85; transform: scale(1); }
+  }
+
+  .vaiven { animation: vaiven 7s ease-in-out infinite; }
+  @keyframes vaiven {
+    0%, 100% { transform: translateY(0) rotate(-1.5deg); }
+    50%      { transform: translateY(-6px) rotate(1.5deg); }
+  }
+
+  .flota       { animation: flota 6.5s ease-in-out infinite; }
+  .flota-lento { animation: flota 9.5s ease-in-out infinite; }
+  @keyframes flota {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50%      { transform: translateY(-9px) rotate(1.2deg); }
+  }
+
+  /* Latido del marco de la cabecera. 14 s y 3.5 %: por debajo de
+     eso no se percibe, por encima marea en una página que además
+     se hace scroll. */
+  .respira { animation: respira 14s ease-in-out infinite; }
+  @keyframes respira {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.035); }
+  }
+
+  /* --- Pétalos recortados del marco -------------------------
+     Tres ritmos con periodos primos entre sí para que el conjunto no
+     caiga nunca en sincronía; con periodos parecidos el ojo detecta el
+     compás y se ve como un GIF en bucle.
+
+     El giro base llega en `--giro` desde el estilo en línea. Las
+     animaciones lo suman en vez de sustituirlo: si el keyframe pusiera
+     `rotate(8deg)` a secas, cada pétalo perdería su orientación al
+     arrancar y darían un salto visible. Con movimiento reducido no hay
+     animación y el `transform` en línea deja cada pétalo en su ángulo. */
+  .deriva   { animation: deriva 11s ease-in-out infinite; }
+  .deriva-b { animation: deriva-b 14s ease-in-out infinite; }
+  .deriva-c { animation: deriva-c 17s ease-in-out infinite; }
+
+  @keyframes deriva {
+    0%, 100% { transform: translate3d(0, 0, 0) rotate(var(--giro, 0deg)); }
+    50%      { transform: translate3d(7px, -11px, 0) rotate(calc(var(--giro, 0deg) + 9deg)); }
+  }
+  @keyframes deriva-b {
+    0%, 100% { transform: translate3d(0, 0, 0) rotate(var(--giro, 0deg)); }
+    50%      { transform: translate3d(-9px, -7px, 0) rotate(calc(var(--giro, 0deg) - 11deg)); }
+  }
+  @keyframes deriva-c {
+    0%, 100% { transform: translate3d(0, 0, 0) rotate(var(--giro, 0deg)); }
+    50%      { transform: translate3d(5px, 9px, 0) rotate(calc(var(--giro, 0deg) + 6deg)); }
+  }
+
+  /* --- Racimos de rosas del marco del carrusel ---------------
+     Dos amplitudes. `.mece` mueve 2 px y 0.8°: es lo que aguanta
+     mientras la copia está montada encima de la rosa que el marco trae
+     pintada, porque a más recorrido asoma el original por debajo.
+     `.mece-amplio` es para cuando el marco sea el limpio. La elige
+     `MARCO_FOTO.sinRosas`, no el gusto. */
+  .mece        { animation: mece 6s ease-in-out infinite; }
+  .mece-amplio { animation: mece-amplio 7.5s ease-in-out infinite; }
+  @keyframes mece {
+    0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+    50%      { transform: translate3d(0, -2px, 0) rotate(0.8deg); }
+  }
+  @keyframes mece-amplio {
+    0%, 100% { transform: translate3d(0, 0, 0) rotate(-1.2deg); }
+    50%      { transform: translate3d(3px, -8px, 0) rotate(1.8deg); }
+  }
+  /* Los cuatro racimos comparten periodo pero arrancan desfasados: sin
+     esto respiran a la vez y el marco entero parece latir. */
+  .fase-1 { animation-delay: -1.5s; }
+  .fase-2 { animation-delay: -3s; }
+  .fase-3 { animation-delay: -4.5s; }
+
+  /* Brillo que recorre un degradado recortado al texto. */
+  .brilla {
+    background-size: 220% auto;
+    animation: brilla 7s linear infinite;
+  }
+  @keyframes brilla { to { background-position: 220% center; } }
+}
+
+/* Con movimiento reducido nada queda oculto ni desplazado. */
+@media (prefers-reduced-motion: reduce) {
+  .revela, .revela-zoom, .revela-giro, .revela-izq, .revela-der {
+    opacity: 1;
+    transform: none;
+  }
+}

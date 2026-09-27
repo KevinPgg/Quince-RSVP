@@ -42,7 +42,58 @@ export const MARCO_FOTO = {
   proporcion: 620 / 711,
   /** Posición del hueco, en % del marco. */
   hueco: { left: '6.05%', top: '0%', width: '87.11%', height: '73.17%' },
+  /**
+   * Poner en `true` cuando `marco` apunte a la versión SIN rosas.
+   *
+   * Mientras sea `false` las rosas de `ROSAS` se montan justo encima de
+   * las que el marco ya trae pintadas, así que solo pueden moverse un par
+   * de píxeles: más y asoma el original por debajo. Con el marco limpio la
+   * misma capa pasa a amplitud grande sin tocar nada más.
+   */
+  sinRosas: false,
 } as const
+
+// ============================================================
+//  Piezas sueltas recortadas del marco (scripts/ornamentos.py).
+//
+//  Las rosas van con la posición EXACTA de la que salieron, en % del
+//  marco, para que al montarlas encima queden sobre su propio sitio.
+//  `origen` es el punto por el que pivotan: el rabillo de donde cuelga
+//  el racimo, no su centro, o al girar se despegan de la esquina.
+// ============================================================
+
+export type RosaMarco = {
+  src: string
+  left: string
+  top: string
+  width: string
+  origen: string
+  /** 0 a 3; desfasa el vaivén para que no respiren a la vez. */
+  fase: 0 | 1 | 2 | 3
+}
+
+export const ROSAS: RosaMarco[] = [
+  { src: '/recursos/tema/rosa-si.webp', left: '0%',     top: '0%',    width: '19%',   origen: '100% 100%', fase: 0 },
+  { src: '/recursos/tema/rosa-sd.webp', left: '81.5%',  top: '2%',    width: '18.5%', origen: '0% 100%',   fase: 2 },
+  { src: '/recursos/tema/rosa-ii.webp', left: '0%',     top: '65.5%', width: '24.5%', origen: '100% 0%',   fase: 1 },
+  { src: '/recursos/tema/rosa-id.webp', left: '68.5%',  top: '69%',   width: '31.5%', origen: '0% 0%',     fase: 3 },
+]
+
+/**
+ * Pétalos sueltos del marco, con su alfa real.
+ *
+ * Salen de las componentes conexas aisladas dentro del hueco: son los
+ * pétalos que el ilustrador dejó flotando, así que no hay que inventarles
+ * una silueta ni aproximar un recorte. El 5 quedó descartado a mano
+ * porque arrastra una esquina de cortina morada.
+ */
+export const PETALOS = [
+  '/recursos/tema/petalo-1.webp',
+  '/recursos/tema/petalo-2.webp',
+  '/recursos/tema/petalo-3.webp',
+  '/recursos/tema/petalo-4.webp',
+  '/recursos/tema/petalo-6.webp',
+] as const
 
 // ============================================================
 //  Ilustración vertical larga de fondo (opcional).

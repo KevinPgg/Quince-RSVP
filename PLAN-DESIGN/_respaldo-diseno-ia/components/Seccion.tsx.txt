@@ -1,0 +1,43 @@
+import Ornamento from './Ornamento'
+import Petalos from './Petalos'
+
+export default function Seccion({
+  titulo,
+  children,
+  ancla,
+  juego = 0,
+  fondo = 'petalos',
+}: {
+  titulo?: string
+  children: React.ReactNode
+  /** id para enlazar desde otra página. `scroll-mt` evita que el título
+   *  quede pegado al borde superior al aterrizar. */
+  ancla?: string
+  /** 0, 1 o 2: elige el juego de pétalos. Se pasa el índice de la sección
+   *  para que dos seguidas nunca lleven el mismo dibujo. */
+  juego?: number
+  /** `'ninguno'` para las secciones que ya traen su propia ilustración. */
+  fondo?: 'petalos' | 'ninguno'
+}) {
+  return (
+    <section
+      id={ancla}
+      className="contenedor relative scroll-mt-8 overflow-hidden py-8 sm:py-10"
+    >
+      {/* `overflow-hidden` arriba no es cosmético: los pétalos se colocan
+          en porcentajes y sin recorte el que va al 90 % empuja el ancho
+          del documento y aparece scroll horizontal en un móvil. */}
+      {fondo === 'petalos' && <Petalos juego={juego} />}
+
+      <div className="relative">
+        {titulo && (
+          <div className="mb-5 sm:mb-6">
+            <h2 className="titulo-seccion text-center">{titulo}</h2>
+            <Ornamento className="mt-2.5" />
+          </div>
+        )}
+        {children}
+      </div>
+    </section>
+  )
+}

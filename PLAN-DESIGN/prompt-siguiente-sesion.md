@@ -89,8 +89,11 @@ En `public/recursos/tema/`. Los originales pesados en `PLAN-DESIGN/originales/`.
   real de la foto**: la de la graduación, con globos verdes, necesita el máximo
   o el verde le gana al morado del marco.
 
-Peso medido de la portada en el navegador: **347 KB sin tipografías, 458 KB
-con las cuatro familias.**
+Peso de la portada: **347 KB sin tipografías, 458 KB con las cuatro familias**.
+Ojo con ese número: está medido sobre una réplica estática con `<img>`, no
+sobre la app real. Con `next/image` sirviendo variantes por viewport el real
+debería ser menor, pero **nadie lo ha medido todavía en la app**. Si el peso
+importa para una decisión, mídelo antes de citarlo.
 
 ## Cómo verificar desde esta sesión
 
@@ -162,12 +165,31 @@ del marco: la foto original ya es un primer plano muy cerrado y el recorte
 cuadrado deja prácticamente solo un ojo. Hay que alejar ese encuadre en
 `scripts/album.py`.
 
-## Pendientes de antes
+## Estado de los pendientes
 
-- Correr la migración `0003_whatsapp_plantilla.sql` en Supabase.
-- `npm run build` y Lighthouse móvil en Windows.
-- Deploy de prueba en Vercel (confirmar que las rutas en minúscula resuelven).
-- Llevar el marco ilustrado también a la cabecera de `/i/[token]`.
-- Borrar `PLAN-DESIGN/_to_delete/` y `PLAN-DESIGN/pruebas/`.
-- `ILUSTRACION_LARGA` en `config/galeria.ts` sigue en `null`; especificación y
-  prompt de generación en `PLAN-DESIGN/fondo-largo.md`.
+Ya resuelto, no lo repitas:
+
+- La migración `0003_whatsapp_plantilla.sql` **ya está corrida en Supabase** y
+  las funciones validadas. El mensaje de WhatsApp configurable funciona.
+- `npm run build` corre bien en Windows. Kevin lo verifica él y avisa si falla.
+- `PLAN-DESIGN/_to_delete/` y `PLAN-DESIGN/pruebas/` ya están vacías; solo
+  quedan las carpetas.
+
+Sigue pendiente:
+
+- **Deploy de prueba en Vercel** — aplazado a propósito. No es prioridad ahora.
+  Cuando toque, lo que hay que confirmar es que las rutas en minúscula
+  resuelven, porque Linux distingue mayúsculas y Windows no.
+- **Lighthouse móvil**, en Windows.
+- **Llevar el marco ilustrado a la cabecera de `/i/[token]`**, que hoy sigue con
+  el degradado y el castillo. Hacerlo después de validar la portada nueva.
+- **La ilustración vertical larga hay que replantearla.** `ILUSTRACION_LARGA`
+  en `config/galeria.ts` sigue en `null` y la capa `components/FondoLargo.tsx`
+  está montada y apagada. La especificación y el prompt de generación están en
+  `PLAN-DESIGN/fondo-largo.md`, pero **ese enfoque no convence todavía**: una
+  sola imagen de 4000 px de alto es difícil de generar con calidad uniforme y
+  cara en bytes. Vale la pena reconsiderar el planteamiento entero antes de
+  invertir en generarla — quizá bandas ilustradas por sección, o extender los
+  recursos que ya existen, salga mejor que una tira gigante.
+- `marco-texto.webp` está generado y sin usar. Candidato natural para el bloque
+  «Confirma tu lugar» o para el saludo del cartucho.

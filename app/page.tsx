@@ -1,15 +1,14 @@
-import Link from 'next/link'
-import Image from 'next/image'
-import Filigrana from '@/components/Filigrana'
-import Album from '@/components/Album'
-import Cabecera from '@/components/Cabecera'
+import Portada from '@/components/Portada'
+import Camafeos from '@/components/Camafeos'
 import Revelar from '@/components/Revelar'
-import FondoLargo from '@/components/FondoLargo'
-import { obtenerEvento, flagsDe, fechaLarga, horaDe, ZONA_HORARIA } from '@/lib/evento'
+import { obtenerEvento, flagsDe, fechaSinDia, horaDe, ZONA_HORARIA } from '@/lib/evento'
 import Contador from '@/components/Contador'
 import Seccion from '@/components/Seccion'
+import HorizonteCastillo from '@/components/HorizonteCastillo'
 import Lugar from '@/components/Lugar'
+import Itinerario from '@/components/Itinerario'
 import ListaAsistentes from '@/components/ListaAsistentes'
+import { Corona, Esquinas } from '@/components/tema/Ornamentos'
 
 export const dynamic = 'force-dynamic'
 
@@ -18,133 +17,138 @@ export default async function Home() {
   const flags = flagsDe(e)
 
   return (
-    <main className="relative pb-16">
-      {/* Ilustración larga opcional. Ver ILUSTRACION_LARGA en config/galeria.ts. */}
-      <FondoLargo />
-
-      {/* ---------- Cabecera ---------- */}
-      <Cabecera
+    <>
+      <Portada
         nombre={e.nombre}
-        fecha={fechaLarga(e.fecha, ZONA_HORARIA)}
+        fecha={fechaSinDia(e.fecha, ZONA_HORARIA)}
         frase={e.frase}
       />
 
-      {flags.mostrarContador && e.fecha && (
-        <Seccion titulo="Faltan">
-          <Contador fechaISO={e.fecha} />
-        </Seccion>
-      )}
-
-      {/* ---------- Álbum ----------
-          Va temprano, antes de la logística: quien llega a la portada
-          entra por la persona, no por la dirección del salón. */}
-      <Seccion titulo="De niña a quinceañera">
-        <Revelar efecto="zoom">
-          <Album />
-        </Revelar>
-      </Seccion>
-
-      {/* ---------- Sobre la fiesta ---------- */}
-      {e.home_descripcion && (
-        <Seccion titulo={e.home_titulo ?? 'La fiesta'}>
-          <div className="tarjeta space-y-4 text-sm leading-relaxed text-muted">
-            {e.home_descripcion.split('\n').filter(Boolean).map((p, i) => (
-              <p key={i}>{p}</p>
-            ))}
-          </div>
-        </Seccion>
-      )}
-
-      {/* ---------- Lugares ---------- */}
-      <Seccion titulo="Dónde y cuándo">
-        {e.lugar_nombre ? (
-          <Lugar
-            hora={horaDe(e.fecha, ZONA_HORARIA)}
-            lugar={e.lugar_nombre}
-            direccion={e.lugar_direccion ?? ''}
-            mapsUrl={e.lugar_maps}
-          />
-        ) : (
-          <p className="text-center text-sm text-muted">Detalles próximamente.</p>
+      <main id="contenido" className="relative">
+        {flags.mostrarContador && e.fecha && (
+          <Seccion eyebrow="La cuenta regresiva" titulo="Faltan">
+            <Revelar><Contador fechaISO={e.fecha} /></Revelar>
+          </Seccion>
         )}
-      </Seccion>
 
-      {/* ---------- Itinerario ---------- */}
-      {flags.mostrarItinerario && (e.itinerario?.length ?? 0) > 0 && (
-        <Seccion titulo="Itinerario">
-          <ol className="tarjeta divide-y divide-line">
-            {e.itinerario.map((it, i) => (
-              <li key={i} className="flex items-baseline justify-between gap-4 py-3">
-                <span className="font-display text-lg text-primary">{it.hora}</span>
-                <span className="text-right text-sm text-muted">{it.titulo}</span>
-              </li>
-            ))}
-          </ol>
+        {/* Álbum temprano: quien llega a la portada entra por la persona,
+            no por la dirección del salón. */}
+        <Seccion
+          eyebrow="Álbum"
+          titulo={<>De niña a <em className="font-firma text-[1.25em] not-italic text-[#b52272]">quinceañera</em></>}
+        >
+          <Revelar efecto="zoom"><Camafeos /></Revelar>
         </Seccion>
-      )}
 
-      {/* ---------- Dress code ---------- */}
-      {flags.mostrarDressCode && e.dress_code_titulo && (
-        <Seccion titulo="Código de vestimenta">
-          <div className="tarjeta text-center">
-            <p className="font-display text-2xl text-primary">{e.dress_code_titulo}</p>
-            {e.dress_code_detalle && (
-              <p className="mt-2 text-sm text-muted">{e.dress_code_detalle}</p>
-            )}
-          </div>
-        </Seccion>
-      )}
-
-      {/* ---------- Mesa de regalos ---------- */}
-      {flags.mostrarRegalos && (e.regalos?.length ?? 0) > 0 && (
-        <Seccion titulo="Mesa de regalos">
-          <div className="space-y-4">
-            {e.regalos.map((r, i) => (
-              <div key={i} className="tarjeta text-center">
-                <p className="font-medium">{r.titulo}</p>
-                {r.detalle && <p className="mt-1 text-sm text-muted">{r.detalle}</p>}
+        {e.home_descripcion && (
+          <Seccion eyebrow="Una invitación" titulo={e.home_titulo ?? 'La fiesta'}>
+            <Revelar>
+              <div className="tarjeta-real arco">
+                <Esquinas donde="abajo" />
+                {e.home_descripcion.split('\n').filter(Boolean).map((p, i) => (
+                  <p key={i} className="mt-3 text-[14.5px] leading-[1.75] text-muted first:mt-0">{p}</p>
+                ))}
               </div>
-            ))}
-          </div>
+            </Revelar>
+          </Seccion>
+        )}
+
+        <Seccion eyebrow="El gran día" titulo="Dónde y cuándo">
+          <Revelar>
+            {e.lugar_nombre ? (
+              <Lugar
+                hora={horaDe(e.fecha, ZONA_HORARIA)}
+                lugar={e.lugar_nombre}
+                direccion={e.lugar_direccion ?? ''}
+                mapsUrl={e.lugar_maps}
+              />
+            ) : (
+              <p className="text-center text-sm text-muted">Detalles próximamente.</p>
+            )}
+          </Revelar>
         </Seccion>
-      )}
 
-      {/* ---------- Quiénes asisten ---------- */}
-      {e.lista_publica_activa && (
-        <Seccion titulo="Nos acompañan" ancla="asistentes">
-          <ListaAsistentes
-            formato={e.lista_publica_formato}
-            incluirAcompanantes={flags.pedirNombresAcompanantes}
-          />
+        {flags.mostrarItinerario && (e.itinerario?.length ?? 0) > 0 && (
+          <Seccion eyebrow="La noche" titulo="Itinerario">
+            <Revelar><Itinerario items={e.itinerario} /></Revelar>
+          </Seccion>
+        )}
+
+        {flags.mostrarDressCode && e.dress_code_titulo && (
+          <Seccion eyebrow="Vestimenta" titulo="Código de vestimenta">
+            <Revelar>
+              <div className="tarjeta-real arco">
+                <Esquinas donde="abajo" />
+                <p className="font-firma text-[44px] leading-none text-[#b52272]" style={{ paddingTop: '0.14em' }}>
+                  {e.dress_code_titulo}
+                </p>
+                {e.dress_code_detalle && (
+                  <p className="mt-2 text-[14.5px] leading-[1.75] text-muted">{e.dress_code_detalle}</p>
+                )}
+              </div>
+            </Revelar>
+          </Seccion>
+        )}
+
+        {flags.mostrarRegalos && (e.regalos?.length ?? 0) > 0 && (
+          <Seccion eyebrow="Si deseas un detalle" titulo="Mesa de regalos">
+            <div className="space-y-5">
+              {e.regalos.map((r, i) => (
+                <Revelar key={i} retraso={Math.min(i, 4) as 0 | 1 | 2 | 3 | 4}>
+                  <div className="tarjeta-real">
+                    <Esquinas donde="arriba" />
+                    <p className="font-display text-2xl leading-tight text-ink">{r.titulo}</p>
+                    {r.detalle && <p className="mt-1.5 text-[14.5px] leading-[1.75] text-muted">{r.detalle}</p>}
+                  </div>
+                </Revelar>
+              ))}
+            </div>
+          </Seccion>
+        )}
+
+        {e.lista_publica_activa && (
+          <Seccion eyebrow="Ya confirmaron" titulo="Nos acompañan" ancla="asistentes">
+            <Revelar>
+              <ListaAsistentes
+                formato={e.lista_publica_formato}
+                incluirAcompanantes={flags.pedirNombresAcompanantes}
+              />
+            </Revelar>
+          </Seccion>
+        )}
+
+        {/* ---------- Llamada a la acción ---------- */}
+        <Seccion>
+          <Revelar>
+            <div className="tarjeta-real arco">
+              <Esquinas donde="abajo" />
+              <Corona className="mx-auto mb-2.5 block h-[34px] w-12" />
+              <p className="font-display text-2xl leading-tight text-primary">¿Tienes tu invitación?</p>
+              <p className="mt-2 text-[14.5px] leading-[1.75] text-muted">
+                Cada invitación tiene un link personal. Ábrelo para ver tus lugares
+                reservados y confirmar tu asistencia.
+              </p>
+              {e.contacto_whatsapp && (
+                <a
+                  href={`https://wa.me/${e.contacto_whatsapp}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="boton-oro mt-5 max-w-full whitespace-normal text-center leading-snug"
+                >
+                  Escribir a {e.contacto_nombre ?? 'los organizadores'}
+                </a>
+              )}
+            </div>
+          </Revelar>
         </Seccion>
-      )}
 
-      {/* ---------- Llamada a la acción ---------- */}
-      <Seccion>
-        <div className="tarjeta text-center">
-          <p className="font-display text-xl text-primary">¿Tienes tu invitación?</p>
-          <p className="mt-2 text-sm leading-relaxed text-muted">
-            Cada invitación tiene un link personal. Ábrelo para ver tus lugares
-            reservados y confirmar tu asistencia.
-          </p>
-          {e.contacto_whatsapp && (
-            <a
-              href={`https://wa.me/${e.contacto_whatsapp}`}
-              target="_blank"
-              rel="noreferrer"
-              className="boton-borde mt-6"
-            >
-              Escribir a {e.contacto_nombre ?? 'los organizadores'}
-            </a>
-          )}
-        </div>
-      </Seccion>
+        {/* El castillo, una sola vez, cerrando el scroll. */}
+        <HorizonteCastillo />
 
-      <p className="pt-6 text-center">
-        <Link href="/acceso" className="text-[10px] uppercase tracking-[0.2em] text-muted/60">
-          Panel
-        </Link>
-      </p>
-    </main>
+        {/* Sin enlace al panel: esta página la ven todos los invitados.
+            Quien administra entra directo a /acceso. */}
+        <div className="pb-10" />
+      </main>
+    </>
   )
 }
