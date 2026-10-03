@@ -1,5 +1,7 @@
 import Portada from '@/components/Portada'
 import Camafeos from '@/components/Camafeos'
+import Personaje from '@/components/tema/Personaje'
+import Musica from '@/components/Musica'
 import Revelar from '@/components/Revelar'
 import { obtenerEvento, flagsDe, fechaSinDia, horaDe, ZONA_HORARIA } from '@/lib/evento'
 import Contador from '@/components/Contador'
@@ -19,6 +21,8 @@ export default async function Home() {
 
   return (
     <>
+      {/* Música de fondo + botón de silencio fijo en la esquina. */}
+      <Musica />
       <Portada
         nombre={e.nombre}
         fecha={fechaSinDia(e.fecha, ZONA_HORARIA)}
@@ -39,7 +43,12 @@ export default async function Home() {
           eyebrow="Álbum"
           titulo={<>De niña a <em className="font-firma text-[1.25em] not-italic text-[#b52272]">quinceañera</em></>}
         >
-          <Revelar efecto="zoom"><Camafeos fotos={album} colores={coloresDe(e)} /></Revelar>
+          <Revelar efecto="zoom">
+            <div className="relative">
+              <Camafeos fotos={album} colores={coloresDe(e)} />
+              <Personaje n="ardilla" anim="asoma" ancho={72} className="bottom-[34px] right-[2px] z-[3]" />
+            </div>
+          </Revelar>
         </Seccion>
 
         {e.home_descripcion && (

@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { obtenerEvento, flagsDe, fechaLarga, horaDe, ZONA_HORARIA } from '@/lib/evento'
@@ -10,8 +11,9 @@ import Revelar from '@/components/Revelar'
 import { MiGrupo } from '@/components/ListaAsistentes'
 import Filigrana from '@/components/Filigrana'
 import Cartucho from '@/components/Cartucho'
-import { Brillos, Corona, Esquinas } from '@/components/tema/Ornamentos'
+import { Brillos, Esquinas, GuirnaldaCartucho } from '@/components/tema/Ornamentos'
 import RsvpForm from './rsvp-form'
+import Personaje from '@/components/tema/Personaje'
 
 export const dynamic = 'force-dynamic'
 
@@ -55,10 +57,10 @@ export default async function Invitacion({
   return (
     <main className="relative pb-16">
       {/* ---------- Héroe (tablero 5a) ----------
-          420 px y no pantalla completa: el cartucho se monta sobre su borde
+          Alto según su contenido, no pantalla completa: el cartucho se monta sobre su borde
           inferior y los dos se leen como una sola pieza. Tope de `max-w-xl`:
           5a está dibujado a 390 px, es una tarjeta, no una página. */}
-      <header className="relative isolate mx-auto h-[420px] w-full max-w-xl overflow-hidden">
+      <header className="relative isolate mx-auto w-full max-w-xl overflow-hidden px-4 pb-[58px] pt-6">
         {/* Pétalos de `fondo-invitacion.png`. Como fondo CSS y no con
             `next/image`: es decorativo y si falta no debe romper nada. */}
         <div
@@ -71,60 +73,53 @@ export default async function Invitacion({
           className="aurora-1 pointer-events-none absolute left-1/2 top-[45%] -z-10 h-[340px] w-[340px] rounded-full opacity-55 blur-[40px]"
           style={{ transform: 'translate(-50%, -50%)', background: 'radial-gradient(circle, #f6d9ec, transparent 70%)' }}
         />
-        {/* Castillo como máscara, desvanecido hacia abajo. Las puntas quedan
-            detrás del nombre y la fecha, igual que en el tablero 5a: a esta
-            opacidad no compiten con el texto. */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 -z-10"
-          style={{
-            WebkitMask: 'linear-gradient(0deg, transparent 0, #000 90px)',
-            mask: 'linear-gradient(0deg, transparent 0, #000 90px)',
-          }}
-        >
-          <div className="castillo w-[min(100%,440px)] opacity-50" />
-        </div>
-
+        {/* Sin castillo de fondo ni corona sueltos: el emblema del «XV» ya
+            trae los dos, y repetidos se leen como error de montaje. */}
         <Brillos
           lista={[
-            { left: '15%', top: '16%' },
-            { left: '81%', top: '24%', tipo: 'lila' },
-            { left: '24%', top: '44%', tipo: 'estrella' },
-            { left: '72%', top: '12%', tipo: 'estrella' },
+            { left: '12%', top: '10%' },
+            { left: '84%', top: '18%', tipo: 'lila' },
+            { left: '8%', top: '58%', tipo: 'estrella' },
+            { left: '90%', top: '52%', tipo: 'estrella' },
           ]}
         />
 
-        <div className="absolute inset-x-0 top-[34px] text-center">
-          <div className="entra entra-1">
-            <Corona className="flota mx-auto mb-2.5 block h-10 w-[58px]" />
-          </div>
+        {/* El emblema ya tiene su azulejo y su conejo: aquí solo el
+            petirrojo, que no aparece en él. */}
+        <div aria-hidden className="entra entra-6 pointer-events-none absolute inset-0">
+          <Personaje n="petirrojo" anim="vuela-b" espejado ancho={70} className="right-[1%] top-[18px]" />
+        </div>
+
+        <div className="relative text-center">
           <p className="entra entra-2 font-cinzel text-[11px] font-semibold uppercase tracking-[0.34em] text-[#8d6bab]">
             Mis
           </p>
 
-          {/* «XV» en tres capas: filo de oro detrás, degradado rosa, y un
-              reflejo que lo recorre. Las dos de encima tienen color de
-              respaldo por si el navegador no recorta el fondo al texto. */}
-          <div className="entra entra-3 relative mt-1 h-[100px] font-cinzel text-[100px] font-bold leading-none" aria-label="XV">
-            <span
-              aria-hidden
-              className="text-accent [-webkit-text-stroke:6px_#c08a2e]"
-              style={{ filter: 'drop-shadow(0 6px 14px rgba(160,110,30,.3))' }}
-            >
-              XV
-            </span>
-            <span aria-hidden className="xv-relleno absolute inset-x-0 top-0">XV</span>
-            <span aria-hidden className="xv-reflejo absolute inset-x-0 top-0">XV</span>
+          {/* Emblema «XV» (public/recursos/tema/xv.webp, 800×507, 128 KB).
+              Fondo lila del original quitado a transparencia (color a alfa),
+              así se posa sobre los pétalos y auroras sin rectángulo; la
+              máscara de .xv-emblema solo suaviza el halo que llega al borde.
+              Márgenes negativos porque la ilustración trae aire alrededor. */}
+          <div className="xv-emblema entra entra-3 relative mx-auto -mb-3 -mt-2 w-[min(100%,480px)]">
+            <Image
+              src="/recursos/tema/xv.webp"
+              alt="XV"
+              width={800}
+              height={507}
+              priority
+              sizes="(min-width: 520px) 480px, 100vw"
+              className="h-auto w-full"
+            />
           </div>
 
           <p
-            className="entra entra-4 mt-1.5 font-firma text-[68px] leading-none text-[#b52272]"
+            className="entra entra-4 font-firma text-[64px] leading-none text-[#b52272]"
             style={{ paddingTop: '0.14em' }}
           >
             {e.nombre}
           </p>
           {e.fecha && (
-            <p className="entra entra-5 mt-3.5 font-cinzel text-[11px] font-semibold uppercase tracking-[0.2em] text-[#5c3a80]">
+            <p className="entra entra-5 mt-3 font-cinzel text-[11px] font-semibold uppercase tracking-[0.2em] text-[#5c3a80]">
               {fechaLarga(e.fecha, ZONA_HORARIA)}
             </p>
           )}
@@ -132,7 +127,17 @@ export default async function Invitacion({
       </header>
 
       {/* ---------- Saludo personal, montado sobre el héroe ---------- */}
-      <div className="contenedor entra entra-6 -mt-[30px]">
+      <div className="contenedor entra entra-6 relative -mt-[30px] mb-14">
+        {/* Guirnalda colgando del borde inferior y la ardilla sentada en su
+            voluta izquierda: así queda FUERA del texto y no flotando.
+            `mb-12` reserva el alto que la guirnalda sobresale. No el conejo:
+            el emblema del «XV», justo encima, ya trae uno dibujado distinto. */}
+        <div aria-hidden className="pointer-events-none absolute inset-x-0 -bottom-[58px] z-[3]">
+          <div className="relative mx-auto w-[min(100%,420px)]">
+            <GuirnaldaCartucho className="block h-auto w-full drop-shadow-[0_3px_4px_rgba(92,43,134,0.18)]" />
+            <Personaje n="ardilla" anim="asoma" ancho={60} className="-left-[2px] bottom-[22%]" />
+          </div>
+        </div>
         <Cartucho>
           <p className="relative font-cinzel text-[10px] font-semibold uppercase tracking-[0.26em] text-[#8a6a33]">
             Con cariño para
@@ -170,6 +175,8 @@ export default async function Invitacion({
               {e.frase}
             </p>
           )}
+          {/* Aire para la guirnalda y la ardilla, que montan sobre este borde. */}
+          <div aria-hidden className="h-5" />
         </Cartucho>
       </div>
 

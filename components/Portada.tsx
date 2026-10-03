@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import Filigrana from './Filigrana'
 import { Brillos, CollarPerlas, Corona } from './tema/Ornamentos'
+import Personaje from './tema/Personaje'
 
 /**
  * Portada a pantalla completa — tablero 4a llevado a CSS.
@@ -63,6 +64,16 @@ export default function Portada({
       {/* ---------- Castillo ---------- */}
       <div aria-hidden className="fundido-abajo pointer-events-none absolute inset-0 -z-10">
         <div className="castillo w-[var(--castillo-w)] opacity-75" />
+      </div>
+
+      {/* ---------- Personajes ----------
+          Pegados a la columna central (máx. 640 px), no a las orillas de
+          la pantalla: en escritorio se perdían en los costados. Sin
+          `transform` en el contenedor para no chocar con `.entra`. */}
+      <div aria-hidden className="entra entra-6 pointer-events-none absolute inset-y-0 left-0 right-0 mx-auto max-w-[640px]">
+        <Personaje n="azulejo" anim="vuela" ancho={92} className="left-[3%] top-[92px]" />
+        <Personaje n="petirrojo" anim="vuela-b" espejado ancho={84} className="right-[2%] top-[210px]" />
+        <Personaje n="conejo" anim="respira" ancho={86} className="bottom-[18px] left-[6%]" />
       </div>
 
       <Brillos
