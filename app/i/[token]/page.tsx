@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { supabaseAdmin } from '@/lib/supabase/admin'
@@ -8,6 +9,7 @@ import Seccion from '@/components/Seccion'
 import Lugar from '@/components/Lugar'
 import Itinerario from '@/components/Itinerario'
 import Revelar from '@/components/Revelar'
+import HorizonteCastillo from '@/components/HorizonteCastillo'
 import { MiGrupo } from '@/components/ListaAsistentes'
 import Filigrana from '@/components/Filigrana'
 import Cartucho from '@/components/Cartucho'
@@ -55,7 +57,7 @@ export default async function Invitacion({
   const lugares = invitado.pases_asignados
 
   return (
-    <main className="relative pb-16">
+    <main className="relative">
       {/* ---------- Héroe (tablero 5a) ----------
           Alto según su contenido, no pantalla completa: el cartucho se monta sobre su borde
           inferior y los dos se leen como una sola pieza. Tope de `max-w-xl`:
@@ -101,15 +103,21 @@ export default async function Invitacion({
               máscara de .xv-emblema solo suaviza el halo que llega al borde.
               Márgenes negativos porque la ilustración trae aire alrededor. */}
           <div className="xv-emblema entra entra-3 relative mx-auto -mb-3 -mt-2 w-[min(100%,480px)]">
-            <Image
-              src="/recursos/tema/xv.webp"
-              alt="XV"
-              width={800}
-              height={507}
-              priority
-              sizes="(min-width: 520px) 480px, 100vw"
-              className="h-auto w-full"
-            />
+            {/* El «XV» lleva a la página principal. El enlace va DENTRO del
+                div con `.entra`: esa animación deja `transform: none` fijado
+                y anularía el realce al pasar el cursor. */}
+            <Link href="/" aria-label="XV — ir a la página principal" title="Ir a la página principal" className="enlace-xv relative block">
+              <Image
+                src="/recursos/tema/xv.webp"
+                alt=""
+                width={800}
+                height={507}
+                priority
+                sizes="(min-width: 520px) 480px, 100vw"
+                className="h-auto w-full"
+              />
+              <span aria-hidden className="enlace-xv-barrido" />
+            </Link>
           </div>
 
           <p
@@ -135,7 +143,7 @@ export default async function Invitacion({
         <div aria-hidden className="pointer-events-none absolute inset-x-0 -bottom-[58px] z-[3]">
           <div className="relative mx-auto w-[min(100%,420px)]">
             <GuirnaldaCartucho className="block h-auto w-full drop-shadow-[0_3px_4px_rgba(92,43,134,0.18)]" />
-            <Personaje n="ardilla" anim="asoma" ancho={60} className="-left-[2px] bottom-[22%]" />
+            <Personaje n="ardilla" anim="asoma" ancho={60} className="left-[2px] bottom-[22%]" />
           </div>
         </div>
         <Cartucho>
@@ -285,6 +293,10 @@ export default async function Invitacion({
           </p>
         </Seccion>
       )}
+
+      {/* El castillo cierra la invitación igual que la portada, y aquí es
+          además el vínculo de vuelta a la página principal. */}
+      <HorizonteCastillo enlace={{ href: '/', texto: 'Visitar la página principal' }} />
     </main>
   )
 }

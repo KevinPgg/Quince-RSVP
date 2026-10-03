@@ -623,6 +623,126 @@ body::after {
             mask-composite: intersect;
   }
 
+  /* ============================================================
+     Vínculos a la página principal desde la invitación.
+     Tres capas de invitación al clic, de más a menos sutil:
+       1. reposo: algo se mueve solo (barrido de luz / sol que respira /
+          cartel que late), lo justo para que el ojo lo note;
+       2. hover y foco: se eleva, se ilumina, cursor de mano;
+       3. presión: se hunde un poco, confirma el toque.
+     Lo que se mueve solo vive dentro de prefers-reduced-motion.
+     ============================================================ */
+
+  /* ---- «XV» ---- */
+  .enlace-xv {
+    cursor: pointer;
+    border-radius: 24px;
+    transition: transform .35s cubic-bezier(.2,.8,.2,1), filter .35s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .enlace-xv:hover, .enlace-xv:focus-visible {
+    transform: translateY(-4px) scale(1.025);
+    filter: drop-shadow(0 10px 18px rgba(155,91,208,.35)) drop-shadow(0 0 14px rgba(255,226,160,.55));
+  }
+  .enlace-xv:active { transform: translateY(0) scale(.98); transition-duration: .1s; }
+  .enlace-xv:focus-visible { outline: 2px solid #c08a2e; outline-offset: 4px; }
+  /* Barrido de luz recortado a la silueta del emblema: la máscara es la
+     misma imagen, así el brillo nunca pinta el fondo transparente. */
+  .enlace-xv-barrido {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(105deg, transparent 38%, rgba(255,255,255,.75) 50%, transparent 62%) no-repeat;
+    background-size: 260% 100%;
+    background-position: 150% 0;
+    mix-blend-mode: soft-light;
+    -webkit-mask: url(/recursos/tema/xv.webp) center / 100% 100% no-repeat;
+            mask: url(/recursos/tema/xv.webp) center / 100% 100% no-repeat;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .enlace-xv-barrido { animation: xv-barrido 5.5s ease-in-out 2.2s infinite; }
+    .enlace-xv:hover .enlace-xv-barrido { animation-duration: 1.6s; animation-delay: 0s; }
+  }
+  @keyframes xv-barrido {
+    0%   { background-position: 150% 0; }
+    35%, 100% { background-position: -50% 0; }
+  }
+
+  /* ---- Castillo ---- */
+  .castillo-enlace {
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .castillo-enlace .castillo-figura { transition: transform .45s cubic-bezier(.2,.8,.2,1), opacity .45s ease, filter .45s ease; }
+  .castillo-enlace .castillo-sol { transition: transform .6s ease, opacity .6s ease; }
+  .castillo-enlace:hover .castillo-figura,
+  .castillo-enlace:focus-visible .castillo-figura {
+    opacity: .9;
+    transform: translateY(-6px);
+    filter: drop-shadow(0 0 18px rgba(255,226,160,.8));
+  }
+  .castillo-enlace:hover .castillo-sol,
+  .castillo-enlace:focus-visible .castillo-sol { transform: translateX(-50%) scale(1.12); }
+  .castillo-enlace:active .castillo-figura { transform: translateY(-2px) scale(.99); transition-duration: .1s; }
+  .castillo-enlace:focus-visible { outline: none; }
+  .castillo-enlace:focus-visible .castillo-cartel { outline: 2px solid #c08a2e; outline-offset: 3px; }
+
+  .castillo-cartel {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 18px;
+    border-radius: 999px;
+    font-family: var(--f-titulo);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: #5c2d82;
+    background: rgba(255,255,255,.72);
+    border: 1px solid rgba(192,138,46,.55);
+    box-shadow: 0 6px 18px -6px rgba(92,43,134,.35);
+    -webkit-backdrop-filter: blur(4px);
+            backdrop-filter: blur(4px);
+    transition: background-color .3s, transform .3s cubic-bezier(.2,.8,.2,1), box-shadow .3s;
+  }
+  .castillo-enlace:hover .castillo-cartel,
+  .castillo-enlace:focus-visible .castillo-cartel {
+    background: #fff;
+    transform: translateX(-50%) translateY(-3px);
+    box-shadow: 0 10px 24px -6px rgba(92,43,134,.45), 0 0 0 4px rgba(232,212,154,.35);
+  }
+  /* Onda que sale del cartel: el mismo gesto que el botón de música. */
+  .castillo-cartel::after {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    border: 1px solid rgba(192,138,46,.6);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .castillo-destello { color: #c08a2e; font-size: 12px; line-height: 1; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .castillo-enlace .castillo-sol { animation: sol-respira 4.5s ease-in-out infinite; }
+    .castillo-cartel::after { animation: cartel-onda 2.8s ease-out infinite; }
+    .castillo-destello { display: inline-block; animation: destello-gira 3s ease-in-out infinite; }
+    .castillo-destello-2 { animation-delay: -1.5s; }
+  }
+  @keyframes sol-respira {
+    0%, 100% { opacity: .85; scale: 1; }
+    50% { opacity: 1; scale: 1.06; }
+  }
+  @keyframes cartel-onda {
+    0% { opacity: .9; transform: scale(1); }
+    70%, 100% { opacity: 0; transform: scale(1.18, 1.5); }
+  }
+  @keyframes destello-gira {
+    0%, 100% { rotate: 0deg; scale: .8; opacity: .6; }
+    50% { rotate: 90deg; scale: 1.15; opacity: 1; }
+  }
+
   /* ---- Personajes de la temática (components/tema/Personaje.tsx) ----
      Contorno blanco de 2 px + halo lila: el mismo «sticker» que ya traen
      los pájaros, aplicado a los cuatro para que se lean como una familia
