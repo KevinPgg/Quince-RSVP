@@ -60,6 +60,8 @@ export type Database = {
           lista_publica_formato: 'nombre_pila' | 'completo'
           whatsapp_plantilla: string | null
           flags: Record<string, boolean>
+          retrato_ruta: string | null
+          album_colores: string[] | null
           actualizado_en: string
         }
         Insert: Partial<Database['public']['Tables']['evento']['Row']>
@@ -124,6 +126,34 @@ export type Database = {
           respondido_en?: string
         }
         Update: Partial<Database['public']['Tables']['rsvp']['Insert']>
+        Relationships: []
+      }
+      fotos: {
+        Row: {
+          id: string
+          ruta: string
+          alt: string
+          pie: string | null
+          orden: number
+          espejo: number | null
+          visible: boolean
+          ancho: number | null
+          alto: number | null
+          creado_en: string
+        }
+        Insert: {
+          id?: string
+          ruta: string
+          alt?: string
+          pie?: string | null
+          orden?: number
+          espejo?: number | null
+          visible?: boolean
+          ancho?: number | null
+          alto?: number | null
+          creado_en?: string
+        }
+        Update: Partial<Database['public']['Tables']['fotos']['Insert']>
         Relationships: []
       }
       bitacora: {

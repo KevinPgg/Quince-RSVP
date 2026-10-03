@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import Filigrana from './Filigrana'
+import { RETRATO_POR_OMISION } from '@/config/galeria'
 
 /**
  * Portada a pantalla completa.
@@ -40,10 +41,12 @@ export default function Cabecera({
   nombre,
   fecha,
   frase,
+  retrato = RETRATO_POR_OMISION,
 }: {
   nombre: string
   fecha: string
   frase: string | null
+  retrato?: string
 }) {
   return (
     <section className="relative">
@@ -126,7 +129,7 @@ export default function Cabecera({
               <div className="absolute -inset-[2px] rounded-full bg-[#fdfaff]" />
               <div className="absolute inset-0 overflow-hidden rounded-full bg-[#f0e6f7]">
                 <Image
-                  src="/recursos/cumpleanera/retrato.jpg"
+                  src={retrato}
                   alt={`Retrato de ${nombre}`}
                   width={344}
                   height={344}

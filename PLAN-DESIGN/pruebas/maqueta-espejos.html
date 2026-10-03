@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maqueta · Espejos del álbum</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500&family=Cormorant+Garamond:ital@0;1&family=Great+Vibes&family=Jost:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="_fuentes-locales.css" onerror="this.remove()">
+<style>
+/* ============================================================
+   Maqueta estática: espejos de princesa en 5 niveles + fondo que
+   cambia de tono con el scroll horizontal. No es código de la app;
+   sirve para decidir el diseño antes de pasarlo a Camafeos.tsx.
+   ============================================================ */
+:root{
+  --oro-lamina: linear-gradient(135deg,#f6e4b4 0%,#c08a2e 26%,#f9efcf 48%,#a8741f 70%,#eed9a4 88%,#c08a2e 100%);
+  --fondo-album:#fdeef4;
+  --tinte: 253 238 244;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:#fdfaff;color:#3a284a;font-family:Jost,system-ui,sans-serif;overflow-x:hidden}
+.eyebrow{font-family:Cinzel,Georgia,serif;letter-spacing:.3em;font-size:11px;text-transform:uppercase;color:#c08a2e;text-align:center;margin:0 0 10px}
+h2{font-family:'Cormorant Garamond',Georgia,serif;font-weight:400;font-size:36px;color:#7b3fa0;text-align:center;margin:0}
+h2 em{font-family:'Great Vibes',cursive;font-style:normal;font-size:1.25em;color:#b52272}
+.nota{max-width:640px;margin:8px auto 0;padding:0 16px;font-size:13px;color:#6d5580;text-align:center}
+
+/* ---------- Banda de color ---------- */
+.banda{position:relative;padding:48px 0 28px;background:var(--fondo-album);transition:background-color .25s linear}
+.banda::before{ /* brillo suave al centro, para que no sea un plano */
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(60% 55% at 50% 45%,rgba(255,255,255,.65),rgba(255,255,255,0) 70%)}
+.banda::after{ /* fundido arriba y abajo hacia el fondo de la página */
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(#fdfaff,rgba(253,250,255,0) 70px,rgba(253,250,255,0) calc(100% - 70px),#fdfaff)}
+
+.tira{position:relative;z-index:1;display:flex;gap:26px;overflow-x:auto;scroll-snap-type:x mandatory;
+  padding:70px 0 34px;scrollbar-width:none}
+.tira::-webkit-scrollbar{display:none}
+.tira::before,.tira::after{content:'';flex:0 0 calc(50% - 136px)}
+figure{margin:0;flex:0 0 220px;scroll-snap-align:center;text-align:center}
+.giro{transition:transform .5s ease-out,filter .5s ease-out}
+figure:not(.activo) .giro{transform:scale(.88);filter:saturate(.85)}
+figcaption{margin-top:58px;min-height:30px;font-family:'Great Vibes',cursive;font-size:28px;line-height:1;color:#b52272;transition:opacity .5s}
+figure:not(.activo) figcaption{opacity:.45}
+
+/* ---------- Espejo base ---------- */
+.espejo{position:relative;width:220px;aspect-ratio:3/4}
+.espejo .aro{position:absolute;inset:0;border-radius:50%;padding:8px;background:var(--oro-lamina);
+  box-shadow:0 22px 40px -16px rgba(92,43,134,.4),inset 0 0 0 1px rgba(255,255,255,.55),inset 0 -2px 3px rgba(120,80,20,.35)}
+.espejo .aro::before{content:'';position:absolute;inset:3px;border-radius:50%;border:1px solid rgba(255,250,235,.85);pointer-events:none}
+.vidrio{position:relative;height:100%;border-radius:50%;overflow:hidden;background:#efe4f7}
+.vidrio img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+/* Lavado: el borde de la foto se funde con el tono actual de la banda. */
+.vidrio::before{content:'';position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:radial-gradient(ellipse at 50% 46%,rgb(var(--tinte) / 0) 52%,rgb(var(--tinte) / .55) 80%,rgb(var(--tinte) / .9) 100%)}
+/* Reflejo del cristal + bisel. Encima de la foto, en pseudoelemento. */
+.vidrio::after{content:'';position:absolute;inset:0;z-index:2;border-radius:50%;pointer-events:none;
+  background:linear-gradient(118deg,rgba(255,255,255,.42) 0 14%,rgba(255,255,255,0) 30% 68%,rgba(255,255,255,.16) 78%,rgba(255,255,255,0) 86%);
+  box-shadow:inset 0 0 0 3px #fdfaff,inset 0 0 0 4px rgba(192,138,46,.5),inset 0 0 26px rgba(92,43,134,.28)}
+
+.adornos{position:absolute;left:-40px;top:-50px;width:300px;height:380px;pointer-events:none;overflow:visible;z-index:3}
+
+/* Nivel 4-5: aro doble con canal oscuro, como moldura tallada. */
+.n4 .aro,.n5 .aro{padding:13px;
+  box-shadow:0 26px 46px -16px rgba(92,43,134,.45),inset 0 0 0 1px rgba(255,255,255,.6),
+             inset 0 0 0 5px rgba(160,110,30,.0),inset 0 -3px 4px rgba(120,80,20,.4)}
+.n4 .aro::before,.n5 .aro::before{inset:5px;border:2px solid rgba(120,80,20,.45);box-shadow:0 0 0 1px rgba(255,248,225,.9),inset 0 0 0 1px rgba(255,248,225,.9)}
+.n5 .giro{filter:drop-shadow(0 0 18px rgba(255,236,190,.75))}
+figure.activo.n5 .espejo::before{content:'';position:absolute;inset:-60px;border-radius:50%;z-index:-1;
+  background:radial-gradient(closest-side,rgba(255,244,214,.95),rgba(255,244,214,0))}
+
+/* ---------- Puntos ---------- */
+.puntos{position:relative;z-index:1;display:flex;justify-content:center;gap:8px}
+.puntos span{height:7px;width:7px;border-radius:9px;background:#e2d3b6;transition:all .3s}
+.puntos span.on{width:18px;background:#c08a2e}
+
+/* ---------- Comparativa ---------- */
+.niveles{display:flex;flex-wrap:wrap;justify-content:center;gap:70px 34px;padding:70px 16px 40px;max-width:1300px;margin:0 auto}
+.niveles figure{flex:0 0 220px}
+.niveles figcaption{font-family:Cinzel,serif;font-size:12px;letter-spacing:.15em;color:#6d5580;margin-top:60px}
+.paleta{display:flex;justify-content:center;gap:10px;margin:18px 0 0;flex-wrap:wrap;padding:0 16px}
+.paleta span{display:flex;align-items:center;gap:6px;font-size:12px;color:#6d5580}
+.paleta i{width:22px;height:22px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}
+@media (prefers-reduced-motion: reduce){.giro,figcaption,.banda{transition:none}}
+</style>
+</head>
+<body>
+
+<!-- Degradados compartidos por todos los SVG. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="oro" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f6e4b4"/><stop offset=".3" stop-color="#c08a2e"/>
+      <stop offset=".55" stop-color="#f9efcf"/><stop offset=".8" stop-color="#a8741f"/><stop offset="1" stop-color="#eed9a4"/>
+    </linearGradient>
+    <radialGradient id="perla" cx=".35" cy=".3" r=".75">
+      <stop offset="0" stop-color="#fff"/><stop offset=".55" stop-color="#f3ebf5"/><stop offset="1" stop-color="#cdbbd6"/>
+    </radialGradient>
+    <radialGradient id="joya" cx=".35" cy=".3" r=".8">
+      <stop offset="0" stop-color="#ffd0e6"/><stop offset=".5" stop-color="#c2417d"/><stop offset="1" stop-color="#7a1048"/>
+    </radialGradient>
+    <radialGradient id="joya-lila" cx=".35" cy=".3" r=".8">
+      <stop offset="0" stop-color="#f1dcff"/><stop offset=".5" stop-color="#8e52c4"/><stop offset="1" stop-color="#4a1d73"/>
+    </radialGradient>
+
+    <!-- Lazo (niveles 1-2) -->
+    <g id="lazo">
+      <path d="M150 50 C140 37 125 37 125 47 C125 56 138 55 150 50Z" fill="url(#oro)" stroke="#9c6d1f" stroke-width=".8"/>
+      <path d="M150 50 C160 37 175 37 175 47 C175 56 162 55 150 50Z" fill="url(#oro)" stroke="#9c6d1f" stroke-width=".8"/>
+      <path d="M147 52 L141 64 M153 52 L159 64" stroke="#c08a2e" stroke-width="2.4" stroke-linecap="round"/>
+      <circle cx="150" cy="50" r="4" fill="url(#joya)"/>
+    </g>
+
+    <!-- Cresta rococó: dos volutas en C y una concha (niveles 3+) -->
+    <g id="cresta">
+      <path d="M150 54 C138 54 128 46 122 36 C116 26 104 26 102 34 C100 41 108 44 112 39" fill="none" stroke="url(#oro)" stroke-width="5" stroke-linecap="round"/>
+      <path d="M150 54 C162 54 172 46 178 36 C184 26 196 26 198 34 C200 41 192 44 188 39" fill="none" stroke="url(#oro)" stroke-width="5" stroke-linecap="round"/>
+      <path d="M150 54 C138 54 128 46 122 36 C116 26 104 26 102 34 C100 41 108 44 112 39" fill="none" stroke="#9c6d1f" stroke-width=".7" opacity=".7"/>
+      <path d="M150 54 C162 54 172 46 178 36 C184 26 196 26 198 34 C200 41 192 44 188 39" fill="none" stroke="#9c6d1f" stroke-width=".7" opacity=".7"/>
+      <!-- concha -->
+      <path d="M150 52 L132 32 Q150 14 168 32 Z" fill="url(#oro)" stroke="#9c6d1f" stroke-width=".8" stroke-linejoin="round"/>
+      <path d="M150 52 L141 24 M150 52 L150 20 M150 52 L159 24 M150 52 L135 29 M150 52 L165 29" stroke="#9c6d1f" stroke-width=".7" opacity=".75"/>
+      <circle cx="150" cy="52" r="5" fill="url(#joya)" stroke="#9c6d1f" stroke-width=".6"/>
+    </g>
+
+    <!-- Remate inferior en gota (niveles 3+) -->
+    <g id="remate">
+      <path d="M150 340 C140 344 136 352 142 358 C146 362 150 366 150 372 C150 366 154 362 158 358 C164 352 160 344 150 340Z" fill="url(#oro)" stroke="#9c6d1f" stroke-width=".8"/>
+      <path d="M150 342 C134 342 122 348 116 354 M150 342 C166 342 178 348 184 354" fill="none" stroke="url(#oro)" stroke-width="3.5" stroke-linecap="round"/>
+      <circle cx="150" cy="353" r="3.6" fill="url(#joya-lila)"/>
+    </g>
+
+    <!-- Volutas laterales con hoja (niveles 4+) -->
+    <g id="voluta">
+      <path d="M40 196 C26 180 26 160 36 150 C44 142 54 148 50 156 C47 162 40 160 41 154" fill="none" stroke="url(#oro)" stroke-width="4.5" stroke-linecap="round"/>
+      <path d="M40 196 C26 212 26 232 36 242 C44 250 54 244 50 236 C47 230 40 232 41 238" fill="none" stroke="url(#oro)" stroke-width="4.5" stroke-linecap="round"/>
+      <path d="M40 196 C32 190 22 192 18 198 C22 204 32 204 40 196Z" fill="url(#oro)" stroke="#9c6d1f" stroke-width=".7"/>
+      <circle cx="40" cy="196" r="4.2" fill="url(#joya)" stroke="#9c6d1f" stroke-width=".6"/>
+    </g>
+
+    <!-- Corona (nivel 5) -->
+    <g id="corona">
+      <path d="M120 22 L114 -8 L130 6 L140 -16 L150 2 L160 -16 L170 6 L186 -8 L180 22 Z"
+            fill="url(#oro)" stroke="#9c6d1f" stroke-width="1" stroke-linejoin="round"/>
+      <rect x="118" y="20" width="64" height="9" rx="2.5" fill="url(#oro)" stroke="#9c6d1f" stroke-width="1"/>
+      <circle cx="114" cy="-10" r="3.4" fill="url(#perla)"/><circle cx="186" cy="-10" r="3.4" fill="url(#perla)"/>
+      <circle cx="140" cy="-18" r="3.4" fill="url(#perla)"/><circle cx="160" cy="-18" r="3.4" fill="url(#perla)"/>
+      <path d="M150 -2 l5 9 -5 9 -5 -9z" fill="url(#joya)"/>
+      <circle cx="132" cy="24.5" r="2.4" fill="url(#joya-lila)"/><circle cx="150" cy="24.5" r="2.8" fill="url(#joya)"/><circle cx="168" cy="24.5" r="2.4" fill="url(#joya-lila)"/>
+    </g>
+  </defs>
+</svg>
+
+<template id="adornos">
+  <!-- Óvalo del espejo en coordenadas del SVG: centro (150,196.7), rx 110, ry 146.7 -->
+  <svg class="adornos" viewBox="0 0 300 380">
+    <g data-n="2-5"><!-- collar de perlas: pathLength fija el número exacto, sin costura -->
+      <ellipse cx="150" cy="196.7" rx="117" ry="153.5" fill="none" stroke="#b9a3c4" stroke-width="7.4" stroke-linecap="round" pathLength="72" stroke-dasharray="0 1" transform="translate(.6 .8)" opacity=".5"/>
+      <ellipse cx="150" cy="196.7" rx="117" ry="153.5" fill="none" stroke="#f7f1f8" stroke-width="7" stroke-linecap="round" pathLength="72" stroke-dasharray="0 1"/>
+    </g>
+    <g data-n="1-2"><use href="#lazo"/></g>
+    <g data-n="3-5"><use href="#cresta"/><use href="#remate"/></g>
+    <g data-n="4-5"><use href="#voluta"/><use href="#voluta" transform="translate(300 0) scale(-1 1)"/></g>
+    <g data-n="5-5"><use href="#corona" transform="translate(0 -6)"/></g>
+  </svg>
+</template>
+
+<section>
+  <p class="eyebrow">Álbum</p>
+  <h2>De niña a <em>quinceañera</em></h2>
+  <p class="nota">Desliza el carrusel: el fondo pasa del rosa de niña al lila de quinceañera, y los espejos se vuelven más elaborados hasta el último, con corona.</p>
+
+  <div class="banda" id="banda">
+    <div class="tira" id="tira"></div>
+    <div class="puntos" id="puntos"></div>
+  </div>
+
+  <div class="paleta" id="paleta"></div>
+</section>
+
+<section style="margin-top:40px">
+  <p class="eyebrow">Comparativa</p>
+  <h2>Los cinco espejos</h2>
+  <div class="niveles" id="niveles"></div>
+</section>
+
+<script>
+const R = '../../public/recursos/cumpleanera/'
+const ALBUM = [
+  ['album-07','Los primeros años'],['album-08',''],['album-09','Navidades'],['album-11',''],
+  ['album-13',''],['album-01',''],['album-02',''],['album-10',''],['album-12',''],
+  ['album-03','Un día de fiesta'],['album-04',''],['album-05','La graduación'],
+  ['album-14',''],['album-15','En el escenario'],['album-16',''],['album-06','Y ahora, quince'],
+]
+// Paleta por defecto (editable desde admin en la versión real).
+const COLORES = ['#fdeef4','#fbe3ee','#f3def6','#e7d4f5','#dcc6f1']
+const NOMBRES = ['Rosa niña','Rosa','Lila claro','Lila','Lila quince']
+
+// Nivel 1..5 según posición. El último siempre es el 5 (corona).
+const nivelDe = (i, n) => i === n - 1 ? 5 : 1 + Math.min(3, Math.floor((i / (n - 1)) * 4))
+
+const tpl = document.getElementById('adornos')
+function espejo(src, nivel){
+  const fig = document.createElement('figure')
+  fig.className = 'n' + nivel
+  fig.innerHTML = `<div class="giro"><div class="espejo"><div class="aro"><div class="vidrio"><img src="${src}" alt=""></div></div></div></div><figcaption></figcaption>`
+  const svg = tpl.content.firstElementChild.cloneNode(true)
+  svg.querySelectorAll('[data-n]').forEach(g => {
+    const [a, b] = g.dataset.n.split('-').map(Number)
+    if (nivel < a || nivel > b) g.remove()
+  })
+  fig.querySelector('.espejo').appendChild(svg)
+  return fig
+}
+
+const tira = document.getElementById('tira'), puntos = document.getElementById('puntos')
+ALBUM.forEach(([f, pie], i) => {
+  const fig = espejo(R + f + '.webp', nivelDe(i, ALBUM.length))
+  fig.querySelector('figcaption').textContent = pie
+  tira.appendChild(fig)
+  puntos.appendChild(document.createElement('span'))
+})
+;[1,2,3,4,5].forEach(n => {
+  const fig = espejo(R + ['album-07','album-11','album-03','album-05','album-06'][n-1] + '.webp', n)
+  fig.classList.add('activo')
+  fig.querySelector('figcaption').textContent = 'Nivel ' + n + ' · ' + ['Tocador','Perlas','Rococó','Barroco','Real'][n-1]
+  document.getElementById('niveles').appendChild(fig)
+})
+COLORES.forEach((c, i) => {
+  const s = document.createElement('span'); s.innerHTML = `<i style="background:${c}"></i>${NOMBRES[i]}`
+  document.getElementById('paleta').appendChild(s)
+})
+
+// ---- Color por scroll: interpolación en RGB entre las paradas ----
+const rgb = h => [1,3,5].map(k => parseInt(h.slice(k, k + 2), 16))
+const STOPS = COLORES.map(rgb)
+function colorEn(p){
+  const x = p * (STOPS.length - 1), i = Math.min(STOPS.length - 2, Math.floor(x)), t = x - i
+  return STOPS[i].map((v, k) => Math.round(v + (STOPS[i + 1][k] - v) * t))
+}
+const banda = document.getElementById('banda')
+let pendiente = false
+function pintar(){
+  pendiente = false
+  const max = tira.scrollWidth - tira.clientWidth
+  const p = max > 0 ? tira.scrollLeft / max : 0
+  const [r, g, b] = colorEn(p)
+  banda.style.setProperty('--fondo-album', `rgb(${r} ${g} ${b})`)
+  banda.style.setProperty('--tinte', `${r} ${g} ${b}`)
+  // Activo = el más cercano al centro (en la app sigue siendo IntersectionObserver).
+  const centro = tira.getBoundingClientRect().left + tira.clientWidth / 2
+  let mejor = 0, dist = Infinity
+  ;[...tira.children].forEach((f, i) => {
+    const r2 = f.getBoundingClientRect(), d = Math.abs(r2.left + r2.width / 2 - centro)
+    if (d < dist) { dist = d; mejor = i }
+  })
+  ;[...tira.children].forEach((f, i) => f.classList.toggle('activo', i === mejor))
+  ;[...puntos.children].forEach((s, i) => s.classList.toggle('on', i === mejor))
+}
+tira.addEventListener('scroll', () => { if (!pendiente) { pendiente = true; requestAnimationFrame(pintar) } }, { passive: true })
+pintar()
+window.irA = i => { const f = tira.children[i]; tira.scrollLeft = f.offsetLeft - (tira.clientWidth - f.offsetWidth) / 2; pintar() }
+</script>
+</body>
+</html>

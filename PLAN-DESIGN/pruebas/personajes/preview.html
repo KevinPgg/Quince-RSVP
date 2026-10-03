@@ -1,0 +1,21 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="_tw.css"><style>
+@font-face{font-family:'Great Vibes';src:url(f/great-vibes-latin-400-normal.woff2)}
+@font-face{font-family:Cinzel;font-weight:500 700;src:url(f/cinzel-latin-500-normal.woff2)}
+@font-face{font-family:'Cormorant Garamond';src:url(f/cormorant-garamond-latin-400-normal.woff2)}
+@font-face{font-family:Jost;src:url(f/jost-latin-400-normal.woff2)}
+:root{--f-titulo:Cinzel,serif;--f-firma:'Great Vibes',cursive;--f-display:'Cormorant Garamond',serif;--f-body:Jost,sans-serif}
+html{scroll-behavior:auto!important}
+/* ---- Personajes (propuesta) ---- */
+.personaje{position:absolute;height:auto;pointer-events:none;
+  filter:drop-shadow(0 0 1px #fff) drop-shadow(0 0 1.5px #fff) drop-shadow(0 0 10px rgba(168,110,235,.55)) drop-shadow(0 8px 10px rgba(60,20,90,.18))}
+@media (prefers-reduced-motion:no-preference){
+  .vuela{animation:vuela 6s ease-in-out infinite}
+  .vuela-b{animation-duration:7s;animation-delay:-2.5s}
+  .respira{transform-origin:50% 100%;animation:respira 4.5s ease-in-out infinite}
+  .asoma{transform-origin:50% 100%;animation:asoma 5s ease-in-out infinite}
+}
+@keyframes vuela{0%,100%{translate:0 0;rotate:-3deg}50%{translate:6px -10px;rotate:3deg}}
+@keyframes respira{0%,100%{scale:1 1}50%{scale:1.02 .985}}
+@keyframes asoma{0%,100%{rotate:0deg}50%{rotate:-4deg}}
+</style></head><body><nav style="position:fixed;z-index:999;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:6px;padding:6px;border-radius:999px;background:rgba(255,255,255,.92);box-shadow:0 6px 20px rgba(92,43,134,.2);font:12px Jost,sans-serif"><a href="?v=portada">Portada</a>·<a href="?v=invitacion">Invitación</a>·<a href="?v=album">Álbum</a>·<a href="?v=portada&sin">Sin personajes</a></nav><div id="r"></div><script src="preview.js"></script></body></html>

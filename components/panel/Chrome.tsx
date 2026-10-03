@@ -18,6 +18,7 @@ export default function Chrome({
   if (sesion.rol === 'dueno') {
     enlaces.push(
       { href: '/admin/evento', label: 'Evento' },
+      { href: '/admin/fotos', label: 'Fotos' },
       { href: '/admin/usuarios', label: 'Usuarios' },
       { href: '/admin/ajustes', label: 'Ajustes' },
       { href: '/admin/bitacora', label: 'Bitácora' }

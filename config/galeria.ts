@@ -127,3 +127,53 @@ export const ILUSTRACION_LARGA: Ilustracion | null = null
 //   src: '/recursos/tema/fondo-largo.webp',
 //   opacidad: 0.32,
 // }
+
+// ============================================================
+//  Álbum gestionado desde /admin/fotos.
+//
+//  Lo de arriba (ALBUM) queda solo como respaldo: se usa cuando la
+//  tabla `fotos` está vacía o la migración 0004 aún no se corrió.
+// ============================================================
+
+/** Foto principal cuando `evento.retrato_ruta` es nulo. */
+export const RETRATO_POR_OMISION = '/recursos/cumpleanera/retrato.jpg'
+
+/** Los cinco espejos, de más sencillo a más elaborado. */
+export const ESPEJOS = ['Tocador', 'Perlas', 'Rococó', 'Barroco', 'Real'] as const
+export type NivelEspejo = 1 | 2 | 3 | 4 | 5
+
+/**
+ * Espejo automático: reparte los cinco niveles por partes iguales
+ * a lo largo del álbum (total de fotos ÷ 5 espejos). La última foto
+ * siempre cae en el 5. Una foto con espejo elegido a mano ignora esto.
+ */
+export function espejoAutomatico(indice: number, total: number): NivelEspejo {
+  if (total <= 1) return 5
+  return Math.min(5, 1 + Math.floor((indice * 5) / total)) as NivelEspejo
+}
+
+/**
+ * Paleta por omisión del fondo del álbum: del rosa de niña al lila
+ * de quinceañera. El fondo se interpola entre estas paradas según el
+ * avance del scroll horizontal.
+ */
+export const COLORES_ALBUM: string[] = ['#fdeef4', '#fbe3ee', '#f3def6', '#e7d4f5', '#dcc6f1']
+
+/** Foto tal como la maneja el panel (/admin/fotos). `espejo` nulo = automático. */
+export type FotoPanel = {
+  id: string
+  src: string
+  pie: string | null
+  espejo: NivelEspejo | null
+  visible: boolean
+}
+
+/** Espejo efectivo de cada foto: el fijado, o el automático entre las visibles. */
+export function espejosEfectivos(fotos: Pick<FotoPanel, 'espejo' | 'visible'>[]): NivelEspejo[] {
+  const total = fotos.filter((f) => f.visible).length
+  let iv = 0
+  return fotos.map((f) => {
+    const auto = espejoAutomatico(f.visible ? iv++ : Math.max(0, iv - 1), Math.max(1, total))
+    return f.espejo ?? auto
+  })
+}

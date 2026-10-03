@@ -1,91 +1,102 @@
 'use client'
 
-import Image from 'next/image'
 import { useEffect, useRef, useState } from 'react'
-import { ALBUM } from '@/config/galeria'
-import { Lazo } from './tema/Ornamentos'
+import type { NivelEspejo } from '@/config/galeria'
+import { aRgb, colorEn } from '@/lib/colores'
+import { EspejoDefs } from './EspejoAdornos'
+import Espejo from './Espejo'
+
+export type FotoCarrusel = { id: string; src: string; alt: string; pie: string; espejo: NivelEspejo }
 
 /**
- * Álbum en camafeos ovalados de oro, con un lazo arriba.
+ * Álbum en espejos de princesa, de niña a quinceañera.
  *
- * Sustituye al carrusel con marco ilustrado. El óvalo no pelea con las
- * fotos: `scripts/album.py` ya las entrega con un lavado lila radial hacia
- * el borde, que es justo la forma de un camafeo.
- *
- * La tira va a sangre (`margin-inline: calc(50% - 50vw)`) y dos
- * separadores flexibles de `50% - 110px - gap` centran la primera y la
- * última foto. Con `padding` en porcentaje no funciona: el porcentaje se
- * resuelve contra el contenedor de la sección, no contra la tira.
- *
- * El indicador usa un IntersectionObserver sobre la tira, no
- * `scrollLeft` en cada cuadro, que en un móvil se siente pegajoso.
+ * - Cada foto lleva uno de cinco espejos (EspejoAdornos); el nivel
+ *   viene ya resuelto del servidor (manual o automático).
+ * - El fondo de la banda se interpola entre los colores del panel
+ *   según el avance del scroll horizontal. Se escribe directo en
+ *   variables CSS dentro de un requestAnimationFrame, sin estado de
+ *   React: un setState por cuadro de scroll se siente pegajoso en
+ *   un móvil.
+ * - El lavado del cristal usa el mismo tono (`--tinte`), así el
+ *   borde de cada foto se funde con el fondo que tiene detrás.
+ * - La tira va a sangre y dos separadores de `50% - 110px - gap`
+ *   centran la primera y la última foto.
  */
-export default function Camafeos() {
+export default function Camafeos({ fotos, colores }: { fotos: FotoCarrusel[]; colores: string[] }) {
   const tiraRef = useRef<HTMLDivElement>(null)
+  const bandaRef = useRef<HTMLDivElement>(null)
   const [activo, setActivo] = useState(0)
 
+  // Color por scroll.
   useEffect(() => {
     const tira = tiraRef.current
-    if (!tira || typeof IntersectionObserver === 'undefined') return
-    const items = Array.from(tira.querySelectorAll('figure'))
-    const obs = new IntersectionObserver(
-      (entradas) => {
-        for (const e of entradas) {
-          if (e.isIntersecting && e.intersectionRatio > 0.6) {
-            setActivo(items.indexOf(e.target as HTMLElement))
-          }
-        }
-      },
-      { root: tira, threshold: [0.6, 0.9] }
-    )
-    items.forEach((i) => obs.observe(i))
-    return () => obs.disconnect()
-  }, [])
+    const banda = bandaRef.current
+    if (!tira || !banda) return
+    const paradas = colores.map(aRgb)
+    let cuadro = 0
+    const pintar = () => {
+      cuadro = 0
+      const max = tira.scrollWidth - tira.clientWidth
+      const [r, g, b] = colorEn(paradas, max > 0 ? tira.scrollLeft / max : 0)
+      banda.style.setProperty('--fondo-album', `rgb(${r} ${g} ${b})`)
+      banda.style.setProperty('--tinte', `${r} ${g} ${b}`)
 
-  if (ALBUM.length === 0) return null
+      // Activo = el más cercano al centro. Con IntersectionObserver, en
+      // escritorio caben 5 fotos enteras y ganaba la última en disparar.
+      const centro = tira.getBoundingClientRect().left + tira.clientWidth / 2
+      let mejor = 0
+      let dist = Infinity
+      tira.querySelectorAll('figure').forEach((f, i) => {
+        const rf = f.getBoundingClientRect()
+        const d = Math.abs(rf.left + rf.width / 2 - centro)
+        if (d < dist) { dist = d; mejor = i }
+      })
+      setActivo((a) => (a === mejor ? a : mejor))
+    }
+    const alScroll = () => { if (!cuadro) cuadro = requestAnimationFrame(pintar) }
+    pintar()
+    tira.addEventListener('scroll', alScroll, { passive: true })
+    window.addEventListener('resize', alScroll)
+    return () => {
+      tira.removeEventListener('scroll', alScroll)
+      window.removeEventListener('resize', alScroll)
+      if (cuadro) cancelAnimationFrame(cuadro)
+    }
+  }, [colores, fotos])
+
+  if (fotos.length === 0) return null
+  const [r0, g0, b0] = aRgb(colores[0])
 
   return (
-    <div>
+    <div
+      ref={bandaRef}
+      className="album-banda [margin-inline:calc(50%_-_50vw)]"
+      style={{ '--fondo-album': `rgb(${r0} ${g0} ${b0})`, '--tinte': `${r0} ${g0} ${b0}` } as React.CSSProperties}
+    >
+      <EspejoDefs />
       <div
         ref={tiraRef}
-        className="flex gap-[18px] overflow-x-auto pb-6 pt-[18px] [margin-inline:calc(50%_-_50vw)] [scrollbar-width:none]
-                   before:shrink-0 before:grow-0 before:basis-[calc(50%_-_128px)] before:content-['']
-                   after:shrink-0 after:grow-0 after:basis-[calc(50%_-_128px)] after:content-['']
+        className="relative z-[1] flex gap-[26px] overflow-x-auto pb-6 pt-[84px] [scrollbar-width:none]
+                   before:shrink-0 before:grow-0 before:basis-[calc(50%_-_136px)] before:content-['']
+                   after:shrink-0 after:grow-0 after:basis-[calc(50%_-_136px)] after:content-['']
                    [&::-webkit-scrollbar]:hidden"
         style={{ scrollSnapType: 'x mandatory' }}
       >
-        {ALBUM.map((f, i) => {
+        {fotos.map((f, i) => {
           const esActivo = i === activo
           return (
             <figure
-              key={f.src}
-              className="m-0 w-[220px] shrink-0 text-center"
+              key={f.id}
+              className={`espejo-figura m-0 w-[220px] shrink-0 text-center ${esActivo ? 'es-activo' : ''}`}
               style={{ scrollSnapAlign: 'center' }}
             >
-              <div
-                className="transition-[transform,filter] duration-500 ease-out"
-                style={{
-                  transform: esActivo ? 'none' : `scale(0.9) rotate(${i % 2 ? 2 : -2}deg)`,
-                  filter: esActivo ? 'none' : 'saturate(0.85)',
-                }}
-              >
-                <div className="camafeo-marco">
-                  <Lazo className="absolute -top-3 left-1/2 z-[2] h-6 w-11 -translate-x-1/2 drop-shadow-[0_2px_3px_rgba(120,80,20,0.3)]" />
-                  <div className="camafeo-interior">
-                    <Image
-                      src={f.src}
-                      alt={f.alt}
-                      fill
-                      sizes="220px"
-                      priority={i === 0}
-                      className="object-cover"
-                    />
-                  </div>
-                </div>
+              <div className="espejo-giro">
+                <Espejo nivel={f.espejo} src={f.src} alt={f.alt} ancho={220} priority={i === 0} />
               </div>
               <figcaption
-                className="mt-3.5 min-h-[26px] font-firma text-[26px] leading-none text-[#b52272] transition-opacity duration-500"
-                style={{ opacity: esActivo ? 1 : 0.5, paddingTop: '0.1em' }}
+                className="mt-[46px] min-h-[28px] font-firma text-[28px] leading-none text-[#b52272] transition-opacity duration-500"
+                style={{ opacity: esActivo ? 1 : 0.45, paddingTop: '0.1em' }}
               >
                 {f.pie}
               </figcaption>
@@ -95,15 +106,12 @@ export default function Camafeos() {
       </div>
 
       {/* Indicador, hermano del scroller: dentro se desplazaba con él. */}
-      <div className="flex justify-center gap-2" aria-hidden>
-        {ALBUM.map((f, i) => (
+      <div className="relative z-[1] flex justify-center gap-2 pb-6" aria-hidden>
+        {fotos.map((f, i) => (
           <span
-            key={f.src}
+            key={f.id}
             className="h-[7px] rounded-full transition-all duration-300"
-            style={{
-              width: i === activo ? 18 : 7,
-              background: i === activo ? '#c08a2e' : '#e2d3b6',
-            }}
+            style={{ width: i === activo ? 18 : 7, background: i === activo ? '#c08a2e' : '#e2d3b6' }}
           />
         ))}
       </div>

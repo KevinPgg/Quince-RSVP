@@ -3,6 +3,7 @@ import Camafeos from '@/components/Camafeos'
 import Revelar from '@/components/Revelar'
 import { obtenerEvento, flagsDe, fechaSinDia, horaDe, ZONA_HORARIA } from '@/lib/evento'
 import Contador from '@/components/Contador'
+import { obtenerAlbum, retratoDe, coloresDe } from '@/lib/album'
 import Seccion from '@/components/Seccion'
 import HorizonteCastillo from '@/components/HorizonteCastillo'
 import Lugar from '@/components/Lugar'
@@ -13,7 +14,7 @@ import { Corona, Esquinas } from '@/components/tema/Ornamentos'
 export const dynamic = 'force-dynamic'
 
 export default async function Home() {
-  const e = await obtenerEvento()
+  const [e, album] = await Promise.all([obtenerEvento(), obtenerAlbum()])
   const flags = flagsDe(e)
 
   return (
@@ -22,6 +23,7 @@ export default async function Home() {
         nombre={e.nombre}
         fecha={fechaSinDia(e.fecha, ZONA_HORARIA)}
         frase={e.frase}
+        retrato={retratoDe(e)}
       />
 
       <main id="contenido" className="relative">
@@ -37,7 +39,7 @@ export default async function Home() {
           eyebrow="Álbum"
           titulo={<>De niña a <em className="font-firma text-[1.25em] not-italic text-[#b52272]">quinceañera</em></>}
         >
-          <Revelar efecto="zoom"><Camafeos /></Revelar>
+          <Revelar efecto="zoom"><Camafeos fotos={album} colores={coloresDe(e)} /></Revelar>
         </Seccion>
 
         {e.home_descripcion && (

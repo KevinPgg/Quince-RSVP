@@ -20,10 +20,13 @@ export default function Portada({
   nombre,
   fecha,
   frase,
+  retrato,
 }: {
   nombre: string
   fecha: string
   frase: string | null
+  /** URL de la foto principal: Storage o el retrato del repo. */
+  retrato: string
 }) {
   return (
     <header
@@ -93,7 +96,7 @@ export default function Portada({
           <div aria-hidden className="absolute -inset-[2px] rounded-full bg-[#fdfaff]" />
           <div className="absolute inset-0 overflow-hidden rounded-full bg-[#f0e6f7]">
             <Image
-              src="/recursos/cumpleanera/retrato.jpg"
+              src={retrato}
               alt={`Retrato de ${nombre}`}
               width={440}
               height={440}

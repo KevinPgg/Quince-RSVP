@@ -15,3 +15,4 @@ export type RespuestaVigente = Pick<
 > | null
 
 export type Resultado = { ok: true } | { ok: false; error: string }
+export type Foto = Database['public']['Tables']['fotos']['Row']
