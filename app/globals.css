@@ -743,21 +743,6 @@ body::after {
     50% { rotate: 90deg; scale: 1.15; opacity: 1; }
   }
 
-  /* ---- Personajes de la temática (components/tema/Personaje.tsx) ----
-     Contorno blanco de 2 px + halo lila: el mismo «sticker» que ya traen
-     los pájaros, aplicado a los cuatro para que se lean como una familia
-     y se peguen a la paleta. */
-  .personaje {
-    position: absolute;
-    max-width: none;
-    pointer-events: none;
-    user-select: none;
-    filter:
-      drop-shadow(0 0 1px #fff) drop-shadow(0 0 1.5px #fff)
-      drop-shadow(0 0 10px rgba(168,110,235,.55))
-      drop-shadow(0 8px 10px rgba(60,20,90,.18));
-  }
-  .personaje-espejado { transform: scaleX(-1); }
   @media (prefers-reduced-motion: no-preference) {
     .personaje-vuela   { animation: pj-vuela 6s ease-in-out infinite; }
     .personaje-vuela-b { animation: pj-vuela 7s ease-in-out -2.5s infinite; }
@@ -898,3 +883,138 @@ body::after {
     transform: none;
   }
 }
+
+/* ===========================================================
+   DECORADO FIJO: personajes, mariposas y cielo.
+   Fuera del bloque MOVIMIENTO a propósito: la posición tiene que
+   valer también con movimiento reducido (antes `.personaje` vivía
+   dentro y, con movimiento reducido, los personajes caían al flujo
+   del documento). Lo que se mueve va en su propio @media.
+   =========================================================== */
+/* ---- Personajes de la temática (components/tema/Personaje.tsx) ----
+   Contorno blanco de 2 px + halo lila: el mismo «sticker» que ya traen
+   los pájaros, aplicado a los cuatro para que se lean como una familia
+   y se peguen a la paleta. */
+.personaje {
+  position: absolute;
+  max-width: none;
+  pointer-events: none;
+  user-select: none;
+  filter:
+    drop-shadow(0 0 1px #fff) drop-shadow(0 0 1.5px #fff)
+    drop-shadow(0 0 10px rgba(168,110,235,.55))
+    drop-shadow(0 8px 10px rgba(60,20,90,.18));
+}
+.personaje-espejado { transform: scaleX(-1); }
+
+/* ---- Mariposas (components/tema/Mariposa.tsx) ----
+   Mismo «sticker» que los personajes: filo blanco + halo lila. El giro
+   y el espejo van en `transform` (estilo en línea); el vuelo usa
+   `translate`/`rotate` sueltos, así no se pisan. */
+.mariposa {
+  position: absolute;
+  display: block;
+  pointer-events: none;
+  user-select: none;
+  filter:
+    drop-shadow(0 0 1px #fff) drop-shadow(0 0 1px #fff)
+    drop-shadow(0 0 8px rgba(168,110,235,.5))
+    drop-shadow(0 6px 6px rgba(60,20,90,.16));
+}
+.mariposa-alas { transform-box: view-box; transform-origin: 50px 42px; }
+@media (prefers-reduced-motion: no-preference) {
+  /* Periodos 11 / 13 s (primos): dos mariposas nunca repiten juntas. */
+  .mariposa-a { animation: mp-vuela 11s ease-in-out var(--retraso, 0s) infinite; }
+  .mariposa-b { animation: mp-vuela-b 13s ease-in-out var(--retraso, 0s) infinite; }
+  .mariposa-a .mariposa-alas { animation: mp-aleteo 2.3s ease-in-out var(--retraso, 0s) infinite; }
+  .mariposa-b .mariposa-alas { animation: mp-aleteo 2.9s ease-in-out var(--retraso, 0s) infinite; }
+  .mariposa-posada .mariposa-alas { animation: mp-posada 4.7s ease-in-out var(--retraso, 0s) infinite; }
+}
+/* Ráfaga de cuatro aletazos y luego planea con las alas abiertas. */
+@keyframes mp-aleteo {
+  0%, 36%, 100% { scale: 1 1; }
+  4.5%  { scale: .22 1; }
+  9%    { scale: 1 1; }
+  13.5% { scale: .26 1; }
+  18%   { scale: 1 1; }
+  22.5% { scale: .3 1; }
+  27%   { scale: 1 1; }
+  31.5% { scale: .4 1; }
+  70%   { scale: .92 1; }
+}
+@keyframes mp-posada {
+  0%, 55%, 100% { scale: 1 1; }
+  70% { scale: .5 1; }
+  80% { scale: .58 1; }
+}
+@keyframes mp-vuela {
+  0%, 100% { translate: 0 0; rotate: -6deg; }
+  25% { translate: 16px -14px; rotate: 7deg; }
+  50% { translate: 6px -28px; rotate: -3deg; }
+  75% { translate: -12px -10px; rotate: 9deg; }
+}
+@keyframes mp-vuela-b {
+  0%, 100% { translate: 0 0; rotate: 5deg; }
+  30% { translate: -18px -12px; rotate: -8deg; }
+  60% { translate: -4px -24px; rotate: 4deg; }
+  80% { translate: 10px -8px; rotate: -5deg; }
+}
+
+/* ---- Cielo de la portada (components/tema/FondoMagico.tsx) ----
+   z -1: encima de body::before (-2), debajo de todo el contenido. */
+.fondo-magico {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+.fondo-orbe {
+  position: absolute;
+  width: 90vmax;
+  height: 90vmax;
+  border-radius: 50%;
+}
+.fondo-orbe-1 { left: -45vmax; top: -40vmax; background: radial-gradient(closest-side, rgba(246,196,226,.42), transparent); }
+.fondo-orbe-2 { right: -50vmax; top: 5vh;   background: radial-gradient(closest-side, rgba(200,170,245,.36), transparent); }
+.fondo-orbe-3 { left: -30vmax; bottom: -55vmax; background: radial-gradient(closest-side, rgba(190,214,255,.40), transparent); }
+.fondo-ocaso {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background:
+    radial-gradient(80% 50% at 50% 110%, rgba(178,160,240,.30), transparent 70%),
+    linear-gradient(180deg, transparent 0%, rgba(214,204,250,.28) 100%);
+}
+.fondo-estrella {
+  position: absolute;
+  opacity: .75;
+  filter: drop-shadow(0 0 4px rgba(200,170,245,.9)) drop-shadow(0 0 1px rgba(192,138,46,.6));
+}
+@media (prefers-reduced-motion: no-preference) {
+  .fondo-orbe-1 { animation: orbe 41s ease-in-out infinite; }
+  .fondo-orbe-2 { animation: orbe 53s ease-in-out -17s infinite reverse; }
+  .fondo-orbe-3 { animation: orbe 47s ease-in-out -9s infinite; }
+  .fondo-estrella { animation: titila 5.3s ease-in-out infinite; }
+  .fondo-estrella:nth-of-type(2n) { animation-duration: 7.1s; }
+  .fondo-estrella:nth-of-type(3n) { animation-duration: 6.1s; }
+}
+@keyframes orbe {
+  0%, 100% { translate: 0 0; }
+  33% { translate: 6vmax 4vmax; }
+  66% { translate: -3vmax 7vmax; }
+}
+@keyframes titila {
+  0%, 100% { opacity: .2; scale: .55; rotate: 0deg; }
+  50% { opacity: .9; scale: 1; rotate: 45deg; }
+}
+/* Amanecer arriba, atardecer lila abajo. El velo sigue al scroll aunque
+   haya movimiento reducido: no se mueve nada, solo cambia el tono. */
+@supports (animation-timeline: scroll()) {
+  .fondo-ocaso {
+    animation: ocaso linear both;
+    animation-timeline: scroll(root);
+  }
+}
+@keyframes ocaso { from { opacity: 0; } to { opacity: 1; } }
+

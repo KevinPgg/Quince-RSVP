@@ -24,6 +24,20 @@ export function DefsTema() {
           <stop offset=".45" stopColor="#f6eefb" />
           <stop offset="1" stopColor="#cdb7de" />
         </radialGradient>
+        {/* Alas de mariposa (components/tema/Mariposa.tsx): oscuro junto al
+            cuerpo, claro hacia el filo. Mismo centro para ala alta y baja. */}
+        {([
+          ['lila', '#5d2f9a', '#a98ae6', '#d8e6ff'],
+          ['rosa', '#8e2f86', '#de9ad6', '#fbe3f4'],
+          ['celeste', '#4a3fa6', '#9db6f2', '#e6f1ff'],
+        ] as const).map(([n, a, b, c]) => (
+          <radialGradient key={n} id={`t-ala-${n}`} gradientUnits="userSpaceOnUse" cx="50" cy="42" r="50">
+            <stop offset="0" stopColor={a} />
+            <stop offset=".45" stopColor={b} />
+            <stop offset=".85" stopColor={c} />
+            <stop offset="1" stopColor={b} />
+          </radialGradient>
+        ))}
         <radialGradient id="t-joya" cx=".35" cy=".3" r=".8">
           <stop offset="0" stopColor="#ffd0e6" />
           <stop offset=".5" stopColor="#c2417d" />

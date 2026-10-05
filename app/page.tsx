@@ -1,6 +1,8 @@
 import Portada from '@/components/Portada'
 import Camafeos from '@/components/Camafeos'
 import Personaje from '@/components/tema/Personaje'
+import Mariposa from '@/components/tema/Mariposa'
+import FondoMagico from '@/components/tema/FondoMagico'
 import Musica from '@/components/Musica'
 import Revelar from '@/components/Revelar'
 import { obtenerEvento, flagsDe, fechaSinDia, horaDe, ZONA_HORARIA, albumTituloDe, regalosTituloDe, hayRegalos } from '@/lib/evento'
@@ -24,6 +26,7 @@ export default async function Home() {
   return (
     <>
       {/* Música de fondo + botón de silencio fijo en la esquina. */}
+      <FondoMagico />
       <Musica />
       <Portada
         nombre={e.nombre}
@@ -49,6 +52,7 @@ export default async function Home() {
             <div className="relative">
               <Camafeos fotos={album} colores={coloresDe(e)} />
               <Personaje n="ardilla" anim="asoma" ancho={72} className="bottom-[34px] right-[2px] z-[3]" />
+              <Mariposa ancho={28} tono="rosa" vuelo="b" giro={-20} retraso={2} className="bottom-[118px] right-[16px] z-[3]" />
             </div>
           </Revelar>
         </Seccion>
@@ -68,6 +72,7 @@ export default async function Home() {
 
         <Seccion eyebrow="El gran día" titulo="Dónde y cuándo">
           <Revelar>
+            <div className="relative">
             {e.lugar_nombre ? (
               <Lugar
                 hora={horaDe(e.fecha, ZONA_HORARIA)}
@@ -78,6 +83,11 @@ export default async function Home() {
             ) : (
               <p className="text-center text-sm text-muted">Detalles próximamente.</p>
             )}
+            {/* Pegaso al pie de la tarjeta del lugar, con su mariposa. Va por
+                debajo del botón «Cómo llegar»: a 360 px se lo tapaba. */}
+              <Personaje n="pegaso" anim="respira" ancho={96} className="-bottom-[52px] -right-[8px] z-[3]" />
+              <Mariposa ancho={24} tono="celeste" vuelo="b" giro={-16} retraso={5} className="-bottom-[30px] right-[92px] z-[3]" />
+            </div>
           </Revelar>
         </Seccion>
 
@@ -125,6 +135,10 @@ export default async function Home() {
           <Revelar>
             <div className="tarjeta-real arco">
               <Esquinas donde="abajo" />
+              {/* Crackle asomado sobre el hombro del arco (la esquina que el arco
+                  deja vacía), con una mariposa delante. Abajo tapaba el botón. */}
+              <Personaje n="dragon" anim="asoma" ancho={80} className="-left-[14px] -top-[44px] z-[3]" />
+              <Mariposa ancho={22} tono="rosa" vuelo="a" giro={14} retraso={3} className="-top-[52px] left-[70px] z-[3]" />
               <Corona className="mx-auto mb-2.5 block h-[34px] w-12" />
               <p className="font-display text-2xl leading-tight text-primary">¿Tienes tu invitación?</p>
               <p className="mt-2 text-[14.5px] leading-[1.75] text-muted">

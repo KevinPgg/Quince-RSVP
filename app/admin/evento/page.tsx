@@ -95,7 +95,7 @@ export default async function PaginaEvento() {
 
       <Bloque titulo="Página principal" descripcion="Lo que ve quien entra al sitio sin un link de invitación.">
         <div className="sm:col-span-2">
-          <Campo id="album_titulo" label="Título del carrusel de fotos" ayuda={`Lo que pongas entre *asteriscos* sale en letra de firma. Vacío = «${TEXTOS_POR_OMISION.albumTitulo}».`}>
+          <Campo id="album_titulo" label="Título del carrusel de fotos" ayuda={`Lo que pongas entre *asteriscos* sale en letra de firma; sin asteriscos se pinta solo el último 30 % de la frase. Vacío = «${TEXTOS_POR_OMISION.albumTitulo}».`}>
             <input id="album_titulo" name="album_titulo" className="campo" defaultValue={e.album_titulo ?? ''} maxLength={80} placeholder={TEXTOS_POR_OMISION.albumTitulo} />
           </Campo>
         </div>

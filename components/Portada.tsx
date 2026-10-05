@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import Filigrana from './Filigrana'
 import { Brillos, CollarPerlas, Corona } from './tema/Ornamentos'
+import Mariposa from '@/components/tema/Mariposa'
 import Personaje from './tema/Personaje'
 
 /**
@@ -74,6 +75,11 @@ export default function Portada({
         <Personaje n="azulejo" anim="vuela" ancho={92} className="left-[3%] top-[92px]" />
         <Personaje n="petirrojo" anim="vuela-b" espejado ancho={84} className="right-[2%] top-[210px]" />
         <Personaje n="conejo" anim="respira" ancho={86} className="bottom-[18px] left-[6%]" />
+        {/* Mariposas junto a cada personaje: una persigue al azulejo, otra
+            acompaña al petirrojo y la tercera revolotea sobre el conejo. */}
+        <Mariposa ancho={34} tono="lila" vuelo="a" giro={18} className="left-[21%] top-[64px]" />
+        <Mariposa ancho={26} tono="rosa" vuelo="b" giro={-22} retraso={4} className="right-[19%] top-[178px]" />
+        <Mariposa ancho={30} tono="celeste" vuelo="a" giro={-12} retraso={7} className="bottom-[150px] left-[25%]" />
       </div>
 
       <Brillos

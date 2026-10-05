@@ -17,6 +17,10 @@ const FUENTES = {
   petirrojo: { src: '/recursos/personajes/petirrojo.webp', w: 445, h: 433 },
   conejo: { src: '/recursos/personajes/conejo.webp', w: 307, h: 413 },
   ardilla: { src: '/recursos/personajes/ardilla.webp', w: 314, h: 411 },
+  // Recortados de la lámina que mandó Kevin (736 px): fuentes más chicas,
+  // no pasar de ~120 px de ancho.
+  dragon: { src: '/recursos/personajes/dragon.webp', w: 259, h: 243 },
+  pegaso: { src: '/recursos/personajes/pegaso.webp', w: 288, h: 219 },
 } as const
 
 export type NombrePersonaje = keyof typeof FUENTES
