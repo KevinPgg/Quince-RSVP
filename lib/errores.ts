@@ -20,6 +20,16 @@ export function explicar(error: PostgrestError | null, accion: string): string {
     return 'Supabase rechazó la operación por permisos. Casi siempre significa que SUPABASE_SERVICE_ROLE_KEY tiene la clave pública (anon / publishable) en vez de la service_role. Revísala en Settings > API y reinicia el servidor.'
   }
 
+  // Falta una columna: hay una migración nueva sin correr. Va antes del
+  // caso de tabla porque Postgres también dice «does not exist».
+  if (
+    error.code === '42703' ||
+    error.code === 'PGRST204' ||
+    (detalle.includes('column') && (detalle.includes('does not exist') || detalle.includes('could not find')))
+  ) {
+    return 'A la base le falta una columna: hay una migración nueva sin correr. Corre en el SQL Editor de Supabase el archivo más reciente de supabase/migrations (por ejemplo 0005_textos_secciones.sql) y vuelve a guardar.'
+  }
+
   // La migración no se corrió, o se corrió en otro esquema.
   if (error.code === '42P01' || detalle.includes('does not exist')) {
     return 'La tabla no existe. Corre supabase/migrations/0001_init.sql en el SQL Editor del proyecto que apunta NEXT_PUBLIC_SUPABASE_URL.'

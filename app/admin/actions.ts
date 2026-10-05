@@ -6,7 +6,7 @@ import { exigirSesion, hashearPassword, passwordAceptable } from '@/lib/auth'
 import { registrar } from '@/lib/bitacora'
 import { explicar } from '@/lib/errores'
 import { LARGO_MAXIMO } from '@/lib/whatsapp'
-import { desdeInputFecha, textoAItinerario, textoARegalos, ZONA_HORARIA } from '@/lib/evento'
+import { desdeInputFecha, textoAItinerario, ZONA_HORARIA } from '@/lib/evento'
 import { FLAGS_POR_OMISION, type ClaveFlag } from '@/config/features'
 import type { Resultado, Rol } from '@/lib/types'
 
@@ -58,12 +58,14 @@ export async function guardarEvento(fd: FormData): Promise<Resultado> {
       lugar_maps: txt(fd, 'lugar_maps', 500),
 
       itinerario: textoAItinerario(String(fd.get('itinerario') ?? '')),
-      regalos: textoARegalos(String(fd.get('regalos') ?? '')),
+      regalos_titulo: txt(fd, 'regalos_titulo', 80),
+      regalos_texto: txt(fd, 'regalos_texto', 1500),
       dress_code_titulo: txt(fd, 'dress_code_titulo', 80),
       dress_code_detalle: txt(fd, 'dress_code_detalle', 300),
 
       home_titulo: txt(fd, 'home_titulo', 80),
       home_descripcion: txt(fd, 'home_descripcion', 2000),
+      album_titulo: txt(fd, 'album_titulo', 80),
 
       contacto_nombre: txt(fd, 'contacto_nombre', 80),
       contacto_whatsapp: (txt(fd, 'contacto_whatsapp', 20) ?? '').replace(/\D/g, '') || null,

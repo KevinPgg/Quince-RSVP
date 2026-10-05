@@ -62,6 +62,9 @@ export type Database = {
           flags: Record<string, boolean>
           retrato_ruta: string | null
           album_colores: string[] | null
+          regalos_titulo: string | null
+          regalos_texto: string | null
+          album_titulo: string | null
           actualizado_en: string
         }
         Insert: Partial<Database['public']['Tables']['evento']['Row']>

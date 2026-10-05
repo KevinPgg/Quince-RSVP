@@ -111,15 +111,44 @@ export function textoAItinerario(texto: string) {
 }
 
 export function regalosATexto(items: { titulo: string; detalle: string }[]): string {
-  return items.map((i) => `${i.titulo} | ${i.detalle}`).join('\n')
+  return items.map((i) => (i.detalle ? `${i.titulo} | ${i.detalle}` : i.titulo)).join('\n')
 }
 
+/**
+ * Una línea por opción. El «| detalle» es opcional: antes una línea sin
+ * barra se descartaba en silencio y parecía que el guardado fallaba.
+ */
 export function textoARegalos(texto: string) {
   return texto
-    .split('\n')
-    .map((l) => l.split('|'))
-    .filter((p) => p.length >= 2)
-    .map((p) => ({ titulo: p[0].trim().slice(0, 80), detalle: p.slice(1).join('|').trim().slice(0, 200) }))
+    .split(/\r?\n/)
+    .map((l) => l.trim())
+    .filter(Boolean)
+    .map((l) => {
+      const [titulo, ...resto] = l.split('|')
+      return { titulo: titulo.trim().slice(0, 80), detalle: resto.join('|').trim().slice(0, 200) }
+    })
     .filter((i) => i.titulo)
     .slice(0, 10)
+}
+
+// --- Textos de secciones con valor por omisión --------------------------
+
+/** Nulo en la base = este texto. Borrar el campo en el panel lo devuelve. */
+export const TEXTOS_POR_OMISION = {
+  regalosTitulo: 'Mesa de regalos',
+  albumTitulo: 'De niña a *quinceañera*',
+} as const
+
+export function regalosTituloDe(e: Evento): string {
+  return e.regalos_titulo?.trim() || TEXTOS_POR_OMISION.regalosTitulo
+}
+
+export function albumTituloDe(e: Evento): string {
+  return e.album_titulo?.trim() || TEXTOS_POR_OMISION.albumTitulo
+}
+
+/** ¿Hay algo que mostrar en la mesa de regalos? Solo cuenta el texto:
+ *  la lista evento.regalos ya no se muestra ni se edita. */
+export function hayRegalos(e: Evento): boolean {
+  return !!e.regalos_texto?.trim()
 }

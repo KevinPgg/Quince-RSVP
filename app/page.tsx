@@ -3,7 +3,9 @@ import Camafeos from '@/components/Camafeos'
 import Personaje from '@/components/tema/Personaje'
 import Musica from '@/components/Musica'
 import Revelar from '@/components/Revelar'
-import { obtenerEvento, flagsDe, fechaSinDia, horaDe, ZONA_HORARIA } from '@/lib/evento'
+import { obtenerEvento, flagsDe, fechaSinDia, horaDe, ZONA_HORARIA, albumTituloDe, regalosTituloDe, hayRegalos } from '@/lib/evento'
+import TituloRealce from '@/components/TituloRealce'
+import MesaRegalos from '@/components/MesaRegalos'
 import Contador from '@/components/Contador'
 import { obtenerAlbum, retratoDe, coloresDe } from '@/lib/album'
 import Seccion from '@/components/Seccion'
@@ -41,7 +43,7 @@ export default async function Home() {
             no por la dirección del salón. */}
         <Seccion
           eyebrow="Álbum"
-          titulo={<>De niña a <em className="font-firma text-[1.25em] not-italic text-[#b52272]">quinceañera</em></>}
+          titulo={<TituloRealce texto={albumTituloDe(e)} />}
         >
           <Revelar efecto="zoom">
             <div className="relative">
@@ -101,19 +103,9 @@ export default async function Home() {
           </Seccion>
         )}
 
-        {flags.mostrarRegalos && (e.regalos?.length ?? 0) > 0 && (
-          <Seccion eyebrow="Si deseas un detalle" titulo="Mesa de regalos">
-            <div className="space-y-5">
-              {e.regalos.map((r, i) => (
-                <Revelar key={i} retraso={Math.min(i, 4) as 0 | 1 | 2 | 3 | 4}>
-                  <div className="tarjeta-real">
-                    <Esquinas donde="arriba" />
-                    <p className="font-display text-2xl leading-tight text-ink">{r.titulo}</p>
-                    {r.detalle && <p className="mt-1.5 text-[14.5px] leading-[1.75] text-muted">{r.detalle}</p>}
-                  </div>
-                </Revelar>
-              ))}
-            </div>
+        {flags.mostrarRegalos && hayRegalos(e) && (
+          <Seccion eyebrow="Si deseas un detalle" titulo={regalosTituloDe(e)}>
+            <MesaRegalos texto={e.regalos_texto} />
           </Seccion>
         )}
 

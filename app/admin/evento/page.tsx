@@ -1,4 +1,5 @@
-import { obtenerEvento, paraInputFecha, itinerarioATexto, regalosATexto, ZONA_HORARIA } from '@/lib/evento'
+import Link from 'next/link'
+import { obtenerEvento, flagsDe, paraInputFecha, itinerarioATexto, ZONA_HORARIA, TEXTOS_POR_OMISION } from '@/lib/evento'
 import { guardarEvento } from '../actions'
 import FormularioGuardado from '@/components/panel/FormularioGuardado'
 import { Campo, Bloque } from '@/components/panel/Campo'
@@ -8,6 +9,7 @@ export const dynamic = 'force-dynamic'
 export default async function PaginaEvento() {
   const e = await obtenerEvento()
   const tz = ZONA_HORARIA
+  const regalosVisibles = flagsDe(e).mostrarRegalos
 
   return (
     <FormularioGuardado accion={guardarEvento}>
@@ -69,14 +71,34 @@ export default async function PaginaEvento() {
         <Campo id="dress_code_detalle" label="Detalle del código">
           <input id="dress_code_detalle" name="dress_code_detalle" className="campo" defaultValue={e.dress_code_detalle ?? ''} maxLength={300} placeholder="Se reserva el color rosa" />
         </Campo>
+      </Bloque>
+
+      <Bloque titulo="Mesa de regalos" descripcion="Aparece en la portada y en cada invitación, en una sola tarjeta.">
+        {!regalosVisibles && (
+          <p className="rounded-2xl border border-amber-300 bg-amber-50/60 p-3 text-xs leading-relaxed text-ink sm:col-span-2">
+            Esta sección está <strong>apagada</strong>: lo que guardes aquí se conserva, pero no se verá
+            en la página hasta que actives «Mesa de regalos» en{' '}
+            <Link href="/admin/ajustes" className="text-primary underline underline-offset-2">Ajustes</Link>.
+          </p>
+        )}
         <div className="sm:col-span-2">
-          <Campo id="regalos" label="Mesa de regalos" ayuda="Una línea por opción:  título | detalle">
-            <textarea id="regalos" name="regalos" className="campo min-h-24 font-mono text-sm" defaultValue={regalosATexto(e.regalos ?? [])} placeholder={'Lluvia de sobres | Tu presencia es el mejor regalo'} />
+          <Campo id="regalos_titulo" label="Título de la sección" ayuda={`Vacío = «${TEXTOS_POR_OMISION.regalosTitulo}».`}>
+            <input id="regalos_titulo" name="regalos_titulo" className="campo" defaultValue={e.regalos_titulo ?? ''} maxLength={80} placeholder={TEXTOS_POR_OMISION.regalosTitulo} />
+          </Campo>
+        </div>
+        <div className="sm:col-span-2">
+          <Campo id="regalos_texto" label="Contenido" ayuda="La primera línea sale destacada, como encabezado de la tarjeta. Cada línea siguiente es un párrafo.">
+            <textarea id="regalos_texto" name="regalos_texto" className="campo min-h-28" defaultValue={e.regalos_texto ?? ''} maxLength={1500} placeholder={'Tu presencia es mi mejor regalo\nSi deseas tener un detalle conmigo, agradeceré tu obsequio en sobre cerrado.'} />
           </Campo>
         </div>
       </Bloque>
 
       <Bloque titulo="Página principal" descripcion="Lo que ve quien entra al sitio sin un link de invitación.">
+        <div className="sm:col-span-2">
+          <Campo id="album_titulo" label="Título del carrusel de fotos" ayuda={`Lo que pongas entre *asteriscos* sale en letra de firma. Vacío = «${TEXTOS_POR_OMISION.albumTitulo}».`}>
+            <input id="album_titulo" name="album_titulo" className="campo" defaultValue={e.album_titulo ?? ''} maxLength={80} placeholder={TEXTOS_POR_OMISION.albumTitulo} />
+          </Campo>
+        </div>
         <Campo id="home_titulo" label="Título de la sección">
           <input id="home_titulo" name="home_titulo" className="campo" defaultValue={e.home_titulo ?? ''} maxLength={80} />
         </Campo>

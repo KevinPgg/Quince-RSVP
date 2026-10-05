@@ -2,7 +2,8 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { supabaseAdmin } from '@/lib/supabase/admin'
-import { obtenerEvento, flagsDe, fechaLarga, horaDe, ZONA_HORARIA } from '@/lib/evento'
+import { obtenerEvento, flagsDe, fechaLarga, horaDe, ZONA_HORARIA, regalosTituloDe, hayRegalos } from '@/lib/evento'
+import MesaRegalos from '@/components/MesaRegalos'
 import type { Invitado, RespuestaVigente } from '@/lib/types'
 import Contador from '@/components/Contador'
 import Seccion from '@/components/Seccion'
@@ -262,25 +263,22 @@ export default async function Invitacion({
         </Seccion>
       )}
 
-      {flags.mostrarRegalos && (e.regalos?.length ?? 0) > 0 && (
-        <Seccion eyebrow="Si deseas un detalle" titulo="Mesa de regalos">
-          <div className="space-y-5">
-            {e.regalos.map((r, i) => (
-              <Revelar key={i}>
-                <div className="tarjeta-real">
-                  <Esquinas donde="arriba" />
-                  <p className="font-display text-2xl leading-tight text-ink">{r.titulo}</p>
-                  {r.detalle && <p className="mt-1.5 text-[14.5px] leading-[1.75] text-muted">{r.detalle}</p>}
-                </div>
-              </Revelar>
-            ))}
-          </div>
+      {flags.mostrarRegalos && hayRegalos(e) && (
+        <Seccion eyebrow="Si deseas un detalle" titulo={regalosTituloDe(e)}>
+          <MesaRegalos texto={e.regalos_texto} />
         </Seccion>
       )}
 
+
+      {/* El castillo cierra la invitación igual que la portada, y aquí es
+          además el vínculo de vuelta a la página principal. */}
+      <HorizonteCastillo enlace={{ href: '/', texto: 'Visitar la página principal' }} />
+
+      
       {flags.mostrarContacto && e.contacto_whatsapp && (
         <Seccion>
-          <p className="text-center text-sm leading-relaxed text-muted">
+          <p style={{ marginBottom: '0.75em' }} 
+            className="text-center text-sm leading-relaxed text-muted">
             ¿Dudas? Escribe a {e.contacto_nombre ?? 'los organizadores'}{' '}
             <a
               className="text-primary underline underline-offset-2"
@@ -290,13 +288,9 @@ export default async function Invitacion({
             >
               por WhatsApp
             </a>
-          </p>
+          </p  >
         </Seccion>
       )}
-
-      {/* El castillo cierra la invitación igual que la portada, y aquí es
-          además el vínculo de vuelta a la página principal. */}
-      <HorizonteCastillo enlace={{ href: '/', texto: 'Visitar la página principal' }} />
     </main>
   )
 }
